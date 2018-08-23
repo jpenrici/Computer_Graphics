@@ -17,3 +17,7 @@ Tested on Debian 9.
 	Or:
 		chmod +x run.sh 
 		./run
+		
+# Reference source
+
+	https://docs.opencv.org/3.1.0/index.html	
