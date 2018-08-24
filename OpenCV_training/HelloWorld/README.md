@@ -16,7 +16,7 @@ Tested on Debian 9.
 
 	Or:
 		chmod +x run.sh 
-		./run
+		./run helloWorld
 		
 # Reference source
 
