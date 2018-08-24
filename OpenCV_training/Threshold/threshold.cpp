@@ -36,7 +36,8 @@ int main(int argc, char** argv)
     imshow("Output", binary_image);
 
     // Save automatically
-    // imwrite("Output", binary_image);
+    // imwrite("Output.jpg", binary_image);
+    imwrite("Output.png", binary_image);
 
     waitKey();
 
