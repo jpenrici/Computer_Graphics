@@ -30,6 +30,10 @@ if [ ! -f "CMakeLists.txt" ]; then
     echo "cmake_minimum_required(VERSION 2.8)" > CMakeLists.txt
     echo "project( $name )" >> CMakeLists.txt
     echo "find_package( OpenCV REQUIRED )" >> CMakeLists.txt
+    echo "message(STATUS \"OpenCV library status:\")" >> CMakeLists.txt
+    echo "message(STATUS \"    version: \${OpenCV_VERSION}\")" >> CMakeLists.txt
+    echo "message(STATUS \"    libraries: \${OpenCV_LIBS}\")" >> CMakeLists.txt
+    echo "message(STATUS \"    include path: \${OpenCV_INCLUDE_DIRS}\")" >> CMakeLists.txt
     echo "add_executable( $name $file )" >> CMakeLists.txt
     echo "target_link_libraries( $name \${OpenCV_LIBS} )" >> CMakeLists.txt
     echo "CMakeLists.txt ... ok"
