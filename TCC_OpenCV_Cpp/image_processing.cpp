@@ -23,6 +23,13 @@ using std::vector;
 // #include <fstream>
 // using std::ofstream;
 
+#include "opencv2/photo.hpp"        // computational photography
+#include "opencv2/imgproc.hpp"      // image processing
+#include "opencv2/imgcodecs.hpp"    // image I/O
+#include "opencv2/highgui.hpp"      // high level GUI and Media
+#include "opencv2/core.hpp"         // core functionality
+using namespace cv;
+
 void processing(const string& /*source*/, const string& /*filename extension*/);
 void list_files(const char*   /*source*/, vector<string>& /*files*/);
 void image_segmentation(const string& /*source*/);
@@ -101,7 +108,7 @@ void processing(const string& source, const string& filename_extension)
         }
     }
     if (is_empty) cout << "nothing found!\n";
-    else cout << "processed ... check the \"output\" folder!\n";
+    else cout << "processed ... check \"output\" folder!\n";
 }
 
 void list_files(const char* source, vector<string>& files)
@@ -141,4 +148,55 @@ void list_files(const char* source, vector<string>& files)
 void image_segmentation(const string& source)
 {
     cout << "process: " << source << " ...\n";
+
+    // filename output
+    auto output = [](string src, string str) {
+        string basename;
+        for (int i = src.size() - 1; i >= 0; --i) {
+            if (src[i] == char(47)) break;
+            basename = src[i] + basename;
+        }
+        basename = "output/" + str + basename; 
+        return basename;
+    };
+
+    // load image
+    Mat image = imread(source, IMREAD_COLOR);
+
+    if (image.empty()) {
+        cout << "Cannot read image: " << source << "\n";
+        return;
+    }
+
+    // change the blackground from black
+    for (int i = 0; i < image.rows; ++i) {
+        for (int j = 0; j < image.cols; ++j) {
+            if (image.at<Vec3b>(i,j) == Vec3b(255,255,255)) {
+                image.at<Vec3b>(i,j)[0] = 0;
+                image.at<Vec3b>(i,j)[1] = 0;
+                image.at<Vec3b>(i,j)[2] = 0;
+            }
+        }
+    }
+
+    // grayscale matrix
+    Mat grayscale_image(image.size(), CV_8U);
+
+    // convert BGR to Gray
+    cvtColor(image, grayscale_image, CV_BGR2GRAY);
+
+    // binary image
+    Mat binary_image(grayscale_image.size(), grayscale_image.type());
+
+    // apply thresholding
+    threshold(grayscale_image, binary_image, 1, 255, THRESH_BINARY);
+
+    // save results
+    string source_output(output(source, "bw_"));
+    cout << source_output << "\n";
+    imwrite(source_output, grayscale_image);
+
+    source_output = output(source, "th_");
+    cout << source_output << "\n";
+    imwrite(source_output, binary_image);
 }
