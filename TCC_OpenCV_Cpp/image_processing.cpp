@@ -29,10 +29,8 @@ void image_segmentation(const string& /*source*/);
 
 int main(int argc, char const** argv)
 {
-    cout << "main started ...\n";
-
     // default
-    string source("."), filename_extension(".png");
+    string source("."), filename_extension(".");
 
     // view command
     for (int i = 0; i < argc; ++i) {
@@ -42,37 +40,38 @@ int main(int argc, char const** argv)
 
     // check input
     if (argc > 3) {
-        // argc = 3     argv[0]          argv[1]          argv[2]
-        cout << "Usage: image_processing --[PNG|JPG|JPEG] <dir_name>\n"
-             << "       image_processing --[PNG|JPG|JPEG]\n"
-             << "       image_image_processing <source image>\n"
-             << "       image_image_processing\n";
+        // argc = 3     argv[0]        argv[1]     argv[2]
+        cout << "use: image_processing --[PNG|JPG] <folder>  # search type in the given folder\n"
+             << "     image_processing --[PNG|JPG]           # search type in current folder\n"
+             << "     image_image_processing <image>         # search only the image\n"
+             << "     image_image_processing                 # search current folder\n";
         return (EXIT_FAILURE);
     }
+
     if (argc > 1) {
         if (argv[1][0] == '-' && argv[1][1] == '-') {
             if (argv[1] == string("--PNG"))  filename_extension = ".png";
             if (argv[1] == string("--JPG"))  filename_extension = ".jpg";
-            if (argv[1] == string("--JPEG")) filename_extension = ".jpeg";
             if (argc == 3) source = argv[2];
         } else {
             source = argv[1];
         }
     }
 
-    // process image
-    cout << "processing source ...\n";
     processing(source, filename_extension);
-
-    cout << "finished!\n";
 
     return (EXIT_SUCCESS);
 }
 
 void processing(const string& source, const string& filename_extension)
 {
-    cout << "source: " << source
-         << "\nfilename extension: " << filename_extension << "\n";
+    cout << "source: ";
+    if (source == ".") cout << "current";
+    else cout << source;
+    
+    cout << "\nextension: ";
+    if (filename_extension == ".") cout << ".png, .jpg\n";
+    else cout << filename_extension << "\n";
 
     // create list of files
     vector<string> sources{source};
@@ -87,19 +86,26 @@ void processing(const string& source, const string& filename_extension)
             transform(temp.begin(), temp.end(), temp.begin(),
                 [](char c){ return tolower(c); });
         }
-        if (temp == filename_extension) {
-            is_empty = false;
+        if (temp == filename_extension && filename_extension != ".") {
             image_segmentation(file);
+            is_empty = false;
+            continue;
+        }
+        if (filename_extension == ".") {
+            if (temp == ".png" || temp == ".jpg") {
+                image_segmentation(file);
+                is_empty = false;
+            } else {
+                cout << file << " : invalid image file!\n";
+            }
         }
     }
-    if (is_empty) cout << "nothing was done found .... \n";
-    else cout << "processed ...\ncheck the \"output\" folder!\n";
+    if (is_empty) cout << "nothing found!\n";
+    else cout << "processed ... check the \"output\" folder!\n";
 }
 
 void list_files(const char* source, vector<string>& files)
 {
-    cout << "reading source ...\n";
-
     DIR* dir;
     struct dirent* entry;
     char entry_source[PATH_MAX + 1];
@@ -116,7 +122,8 @@ void list_files(const char* source, vector<string>& files)
 
     dir = opendir(source);
     if (!dir) {
-        cout << "is not a valid folder name. continue ...\n";
+        cout << source << " : invalid folder!\n";
+        closedir(dir);
         return;
     }
 
@@ -129,11 +136,9 @@ void list_files(const char* source, vector<string>& files)
     }
 
     closedir(dir);
-
-    cout << "folder reading ... ok\n";
 }
 
 void image_segmentation(const string& source)
 {
-    cout << "process " << source << " ...\n";
+    cout << "process: " << source << " ...\n";
 }
