@@ -2,34 +2,41 @@
 #include "image_processing.hpp"
 
 // GUI - interface Gráfica
-int GUI::open(int argc, char **argv) {
-
-    int argc_ = 1; // não usar os argumentos no Gtk::Application.
-    auto app = Gtk::Application::create(argc_, argv, "org.gtkmm.example");
+GUI::GUI(): window(nullptr), button_clean(nullptr)
+{
+    auto app = Gtk::Application::create("dptccGUI");
 
     // carregue o arquivo Glade
     auto refBuilder = Gtk::Builder::create();
     try  {
       refBuilder->add_from_file("gladeGUI.glade");
     } catch(const Glib::FileError& ex) {
-      std::cerr << "FileError: " << ex.what() << "\n";
-      return (EXIT_FAILURE);
+      cerr << "FileError: " << ex.what() << "\n";
+      exit(0);
     } catch(const Glib::MarkupError& ex) {
-      std::cerr << "MarkupError: " << ex.what() << "\n";
-      return (EXIT_FAILURE);
+      cerr << "MarkupError: " << ex.what() << "\n";
+      exit(0);
     } catch(const Gtk::BuilderError& ex) {
-      std::cerr << "BuilderError: " << ex.what() << "\n";
-      return (EXIT_FAILURE);
+      cerr << "BuilderError: " << ex.what() << "\n";
+      exit(0);
+    }
+
+    // instanciar GtkButton
+    refBuilder->get_widget("btnClean", button_clean);
+    if (button_clean) {
+    	button_clean->signal_clicked().connect( sigc::mem_fun(*this,
+    	&GUI::clean_on_btn_clicked));
     }
 
     // instanciar GtkWindow
-    Gtk::Window* pWindow = nullptr;
-    refBuilder->get_widget("gladeWindowMain", pWindow);
+    refBuilder->get_widget("gladeWindowMain", window);
+    if(window) { app->run(*window); }
 
-    // iniciar
-    if(pWindow) { app->run(*pWindow); }
+    delete window;
+    delete button_clean;
+}
 
-    delete pWindow;
-
-    return (EXIT_SUCCESS);
+void GUI::clean_on_btn_clicked() {
+	cout << "clicked\n";
+	ImageProcessing::test();
 }

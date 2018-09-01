@@ -5,6 +5,16 @@ void ImageProcessing::processing(char* path)
     friend_function(path);
 }
 
+void ImageProcessing::test() {
+	cout << "static void test() ... \n";
+	output();
+}
+
+void ImageProcessing::output() {
+	// teste método privado
+	cout << "static void output() ... \n";
+}
+
 void friend_function(char* path)
 {
     // método somente para teste

@@ -11,6 +11,10 @@ public:
     ImageProcessing();
     ~ImageProcessing();
     static void processing(char* /*path*/);
+    static void test();
+
+private:
+	static void output();
 };
 
 void friend_function(char* /*path*/);
