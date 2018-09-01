@@ -3,6 +3,11 @@
 
 #include <gtkmm.h>
 
-// class GUI : public Gtk::Window
+class GUI {
+public:
+	GUI(){};
+	~GUI(){};
+	static int open(int, char**);
+};
 
 #endif // GLADE_GUI_HPP
