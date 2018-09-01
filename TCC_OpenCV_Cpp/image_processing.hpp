@@ -6,11 +6,11 @@ using std::cout;
 
 class ImageProcessing
 {
-	friend void friend_function(char* /*path*/);
+    friend void friend_function(char* /*path*/);
 public:
-	ImageProcessing();
-	~ImageProcessing();
-	static void processing(char* /*path*/);
+    ImageProcessing();
+    ~ImageProcessing();
+    static void processing(char* /*path*/);
 };
 
 void friend_function(char* /*path*/);
