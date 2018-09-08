@@ -72,6 +72,7 @@ int main()
 	std::cout << tools::get_filename_extension("dir/filename.png") << '\n';
 	std::cout << tools::get_filename("dir/filename.png") << '\n';
 	std::cout << tools::get_directory("dir/filename.png") << '\n';
+	std::cout << tools::get_name("NAME.png") << '\n';
 
 	// comparar extensão de arquivo
 	std::cout << std::boolalpha 
@@ -85,6 +86,9 @@ int main()
 		};		
 	std::cout << std::boolalpha << tools::check_filename_extension(
 			tools::upper("dir/filename.jpeg"), map_extension) << '\n';
+
+	// teste map
+	std::cout << tools::find_key("JPEG", map_extension) << '\n';
 
 	// salvar vetor em arquivo texto
 	std::vector<float> v_float {1, 2, 3, 4, 5, 6, 7};
@@ -101,6 +105,15 @@ int main()
 	try {
 		tools::save(v_float, "outfile_float");
 		std::cout << "ok" << '\n';
+	}
+	catch(const std::exception& e) {
+		std::cout << e.what() << '\n';
+	}
+
+	// salvar ou sobrescrever arquivo
+	try {
+		tools::save_new_file("outfile_float");
+		std::cout << "save_new_file ok" << '\n';
 	}
 	catch(const std::exception& e) {
 		std::cout << e.what() << '\n';

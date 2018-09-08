@@ -154,15 +154,24 @@ namespace tools {
 		std::string name = filename.std::string::substr(0, len - 1);
 
 		tokens = {directory, filename, filename_extension, name};
-		std::cout << "{directory, filename, filename_extension, name}:\n{ ";
-		view_vector_line(tokens, "; ");
-		std::cout << " }\n";
+		
+		// std::cout << "{directory, filename, filename_extension, name}:\n{ ";
+		// view_vector_line(tokens, "; ");
+		// std::cout << " }\n";
 	}
 
 	std::string get_directory(const std::string& path)
 	{
 		std::vector<std::string> tokens;
 		split_path(path, tokens);
+
+		return tokens.front();
+	}
+
+	std::string get_name(const std::string& filename)
+	{
+		std::vector<std::string> tokens;
+		split(filename, tokens, char(46));
 
 		return tokens.front();
 	}	
@@ -205,6 +214,35 @@ namespace tools {
 		return true;
 	}
 
+	bool check_extension(const std::string& extension, 
+		const std::unordered_map<std::string, std::string>& map_extension)
+	{
+		if (map_extension.empty()) return false;
+		if (extension.empty()) return false;
+
+		std::unordered_map<std::string, std::string>
+		::const_iterator it = map_extension.find(extension);
+
+		if (it == map_extension.end()) return false;
+
+		return true;
+	}
+
+	std::string find_key(const std::string& key,
+		const std::unordered_map<std::string,std::string>& map)
+	{
+		if (map.empty())
+			throw std::domain_error("error: tools::find_key, map empty.\n");
+		if (key.empty())
+			throw std::domain_error("error: tools::find_key, key empty.\n");
+
+		std::unordered_map<std::string,std::string>
+		::const_iterator it = map.find(key);
+
+		if (it == map.end()) return "";
+		return it->second;
+	}
+
 	template<typename T>
 	void save(const std::vector<T>& v, const std::string& path)
 	{
@@ -234,6 +272,24 @@ namespace tools {
 			std::cout << e.what() << '\n';
 		}
 	}
+
+	void save_new_file(const std::string& path)
+	{
+		std::string path_temp = path;
+		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
+
+		if (path_temp.empty())
+			throw std::domain_error("error: tools::save, path empty.\n");
+
+		try {
+			std::ofstream file_out(path_temp, std::ios::out);
+			file_out.close();
+		}
+		catch(const std::exception& e) {
+			std::cout << "error: tools::save_new_file, path failure.\n";
+			std::cout << e.what() << '\n';
+		}
+	}	
 
 	template<typename T>
 	void write(const T& value,	const std::string& path)
