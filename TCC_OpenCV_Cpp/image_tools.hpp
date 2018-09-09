@@ -13,57 +13,35 @@
 
 namespace img_tools {
 	
-	static const std::string WORKSPACE = "Workspace/";
-	static const std::string WORKSPACE_IMGP = "Workspace/imgp/";
+	// padrão
+	static const std::string WORKSPACE = "Workspace";
+	static const std::string WORKSPACE_IMGP = "/imgp";
+	static const std::string WORKSPACE_OUT = "/output";
 	static const std::string METHOD = "M0_";
 
-	static const std::unordered_map<std::string, std::string> map_extension = {
+	static const std::unordered_map<std::string, std::string> map_default = {
+		{"ORIGINAL"  , "/original"},
+		{"GRAYSCALE" , "/grayscale"},
+		{"BINARY"    , "/binary"},
+		{"BINARY_INV", "/binary_inv"}
+	};	
+
+	static const std::unordered_map<std::string, std::string>
+	map_extension = {
 		{"PNG", "png"}, {"JPG", "jpg"}, {"JPEG", "jpeg"},
 	};
 
-	static const std::unordered_map<std::string, std::string> map_default = {
-		{"ORIGINAL"  , "output/original/"},
-		{"GRAYSCALE" , "output/grayscale/gray-"},
-		{"BINARY"    , "output/binary/bin-"},
-		{"BINARY_INV", "output/binary/bininv-"}
-	};	
-
-	std::unordered_map<std::string, std::string> map_imgp;
-
+	// configuração inicial - variáveis públicas
 	std::vector<std::string> info;
 	std::string directory, filename, extension, name;
-	std::string workspace(WORKSPACE), workspace_imgp(WORKSPACE_IMGP);
+	std::string workspace(WORKSPACE);
 	std::string method_name(METHOD);
 	std::string imgp_path, path_temp;
 
 	void error(int line, const std::string& msg)
 	{
 		throw std::domain_error("[Line: " + std::to_string(line) + "]: " + msg);
-	}	
-
-	void view_map_load()
-	{
-		std::cout << "Map currently loaded:\n";
-		try {
-			tools::view_map(map_imgp);
-		}
-		catch(const std::exception& e) {
-			error(__LINE__, "img_tools::view_map_load");
-		}
 	}
-
-	void status_map()
-	{
-		view_map_load();
-		std::cout << "\nIMGP: " << imgp_path
-			<< "\nfilename: " << filename
-			<< "\nname: " << name << '\n';
-	}
-
-	std::string get_path_map(const std::string& key)
-	{
-		return tools::find_key(key, map_imgp);
-	}	
 
 	void validate (const std::string& file_image)
 	{
@@ -83,114 +61,96 @@ namespace img_tools {
 		directory = info[0];
 		filename = info[1];
 		extension = info[2];
-		name = info[3];		
-	}
+		name = info[3];
+	}	
 
-	void initialize_imgp_default(const std::string& file_image)
+	bool exist_workspace(const std::string& new_workspace)
 	{
-		try {
-			info_path(file_image);	
-			validate(file_image);			
-			map_imgp.clear();
-
-			imgp_path = workspace_imgp + method_name + name + ".imgp";
-			std::cout << "initialize .imgp: " << imgp_path << "\n";
-			tools::save_new_file(imgp_path);
-
-			for (auto it: map_default) {
-				path_temp = std::string(it.first) + ":" + workspace + 
-					std::string(it.second) + filename + '\n';
-				map_imgp.insert(std::make_pair<std::string, std::string>
-					(std::string(it.first),workspace +
-					std::string(it.second) + filename));
-				tools::write(path_temp, imgp_path);
-			}
-			std::cout << "img_tools::initialize_imgp_default ... ok" << '\n';
+		if (!tools::exist_path(new_workspace)) {
+			std::cout << "Workspace don't exist!\n";
+			return false;
 		}
-		catch(const std::exception& e) {
-			error(__LINE__, "img_tools::initialize_imgp_default");
-		}		
+		return true;
 	}
 
-	void create_imgp(const std::string& file_image)
+	void create_workspace(const std::string& new_workspace = workspace, 
+		const std::unordered_map<std::string, std::string>&
+		map_work = map_default)
 	{
 		try {
+			if (exist_workspace(new_workspace)) return;
 
-			if (map_imgp.empty()) {
+			if (new_workspace.empty()) {
+				std::cout << "string workspace empty!\n";
+				return;
+			}
+
+			if (map_work.empty()) {
 				std::cout << "map currently empty!\n";
 				return;
-			}		
-				
-			info_path(file_image);	
-			validate(file_image);			
+			}
 
-			imgp_path = workspace_imgp + method_name + name + ".imgp";
-			std::cout << "create .imgp: " << imgp_path << "\n";
+			tools::create_directory(new_workspace);
+			tools::create_directory(new_workspace + WORKSPACE_IMGP);
+			tools::create_directory(new_workspace + WORKSPACE_OUT);
+
+			for (auto it : map_work) {
+				tools::create_directory(new_workspace + WORKSPACE_OUT
+					+ std::string(it.second));
+			}
+		}
+		catch(const std::exception& e) {
+			error(__LINE__, "img_tools::create_workspace");
+		}
+	}
+
+	void save_imgp(const std::string& file_image,
+		const std::string& new_workspace = workspace,
+		const std::unordered_map<std::string, std::string>&
+		map_work = map_default)
+	{
+		try {
+			if (!exist_workspace(new_workspace))
+				create_workspace(new_workspace);
+
+			info_path(file_image);
+			validate(file_image);			
+ 
+			imgp_path = new_workspace + WORKSPACE_IMGP + "/" + method_name
+				+ name + ".imgp";
+			std::cout << "save .imgp: " << imgp_path;
 			tools::save_new_file(imgp_path);
 
-			for (auto it: map_imgp) {
-				path_temp = std::string(it.first) + ":" + workspace + 
-					std::string(it.second) + filename + '\n';
-				map_imgp.insert(std::make_pair<std::string, std::string>
-					(std::string(it.first),workspace +
-					std::string(it.second) + filename));
+			for (auto it: map_work) {
+				path_temp = std::string(it.first) + ":" + new_workspace
+					+ WORKSPACE_OUT + std::string(it.second) + "/"
+					+ filename + "\n";
 				tools::write(path_temp, imgp_path);
 			}
-			std::cout << "img_tools::create_imgp ... ok" << '\n';
+			tools::write("WORKSPACE:" + new_workspace + "\n", imgp_path);
+
+			std::cout << " ... ok" << '\n';
 		}
 		catch(const std::exception& e) {
 			error(__LINE__, "img_tools::create_imgp");
 		}		
-	}	
-
-	void update_imgp(const std::string& file_imgp)
-	{
-		try {
-
-			if (!tools::check_filename_extension(file_imgp, "imgp"))
-				error(__LINE__, 
-					"img_tools::update_imgp, invalid file_image in.\n");
-
-			if (map_imgp.empty()) {
-				std::cout << "map currently empty!\n";
-				return;
-			}
-
-			std::string file_temp =  tools::get_filename(file_imgp);
-			imgp_path = file_imgp;
-			tools::save_new_file(imgp_path);
-
-			for (auto it: map_imgp) {
-				path_temp = std::string(it.first) + ":"
-					+ std::string(it.second) + '\n';
-				tools::write(path_temp, imgp_path);
-			}
-			std::cout << "img_tools::update ... ok" << '\n';
-		}
-		catch(const std::exception& e) {
-			error(__LINE__, "img_tools::update_imgp");
-		}
 	}
 
-	void recover_imgp(const std::string& file_imgp)
+	std::vector<std::vector<std::string> > load_imgp(const std::string& file_imgp)
 	{
 		std::vector<std::string> lines, word;
+		std::vector<std::vector<std::string> > result {{"EMPTY"}};
 		try {
 			tools::load(file_imgp, lines);
-			map_imgp.clear();
-			std::string file_temp("");
 			for (std::string line : lines) {
 				tools::split(line, word, ':');
-				map_imgp.insert(std::make_pair<std::string, std::string>(
-					std::string(word[0]), std::string(word[1])));
-				if (word[0] == "ORIGINAL") file_temp = word[1];
+				result.push_back(word);
 			}
-			imgp_path = file_imgp;
-			info_path(file_temp);
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "img_tools::recover_imgp");
+			error(__LINE__, "img_tools::load_imgp");
 		}
+		return result;
 	}
 };
 

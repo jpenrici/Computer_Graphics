@@ -49,6 +49,15 @@ namespace tools {
 		view_vector_line(v,";");
 	}
 
+	template<typename T>
+	void view_vector_2D (const std::vector<std::vector<T> >& v)
+	{
+		for (size_t i = 0; i < v.size(); ++i){
+			view_vector(v[i]);
+			std::cout << '\n';
+		}
+	}	
+
 	/*
 	 * MAP
 	 */
