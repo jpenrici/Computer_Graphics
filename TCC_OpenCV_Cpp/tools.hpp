@@ -1,3 +1,6 @@
+/*
+ * Common Methods
+ */
 #ifndef TOOLS_HPP
 #define TOOLS_HPP
 
@@ -16,6 +19,9 @@
 
 namespace tools {
 
+	/*
+	 *	VECTOR
+	 */
 	template<typename T>
 	void view_vector_line(const std::vector<T>& v, const std::string& separator)
 	{
@@ -39,6 +45,38 @@ namespace tools {
 		view_vector_line(v,";");
 	}
 
+	/*
+	 * MAP
+	 */
+	std::string find_key(const std::string& key,
+		const std::unordered_map<std::string,std::string>& map)
+	{
+		if (map.empty())
+			throw std::domain_error("error: tools::find_key, map empty.\n");
+		if (key.empty())
+			throw std::domain_error("error: tools::find_key, key empty.\n");
+
+		std::unordered_map<std::string,std::string>
+		::const_iterator it = map.find(key);
+
+		if (it == map.end()) return "";
+		return it->second;
+	}
+
+	template<typename TFIRST,typename TSECOND>
+	void view_map(const std::unordered_map<TFIRST,TSECOND>& map)
+	{
+		if (map.empty())
+			throw std::domain_error("error: tools::view_map, map empty.\n");
+
+		for (auto it: map){
+			std::cout << it.first << " " << it.second << '\n';
+		}
+	}
+
+	/*
+	 *	STRING
+	 */
 	void to_upper(std::string& str)
 	{
 		if (str.empty())
@@ -128,6 +166,9 @@ namespace tools {
 		remove_pos(key, str, 0);
 	}
 
+	/*
+	 *	STRING: PATH, DIRECTORY, FILENAME
+	 */
 	void split_path(const std::string& path, std::vector<std::string>& tokens)
 	{
 		if (path.empty())
@@ -226,21 +267,6 @@ namespace tools {
 		if (it == map_extension.end()) return false;
 
 		return true;
-	}
-
-	std::string find_key(const std::string& key,
-		const std::unordered_map<std::string,std::string>& map)
-	{
-		if (map.empty())
-			throw std::domain_error("error: tools::find_key, map empty.\n");
-		if (key.empty())
-			throw std::domain_error("error: tools::find_key, key empty.\n");
-
-		std::unordered_map<std::string,std::string>
-		::const_iterator it = map.find(key);
-
-		if (it == map.end()) return "";
-		return it->second;
 	}
 
 	template<typename T>
