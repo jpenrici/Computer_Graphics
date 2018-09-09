@@ -57,9 +57,9 @@ namespace tools {
 	{
 		std::string str("");
 		if (map.empty())
-			error(__LINE__, "error: tools::find_key, map empty.\n");
+			error(__LINE__, "tools::find_key, map empty.\n");
 		if (key.empty())
-			error(__LINE__, "error: tools::find_key, key empty.\n");
+			error(__LINE__, "tools::find_key, key empty.\n");
 
 		std::unordered_map<std::string,std::string>
 		::const_iterator it = map.find(key);
@@ -72,7 +72,7 @@ namespace tools {
 	void view_map(const std::unordered_map<T_first,T_second>& map)
 	{
 		if (map.empty())
-			error(__LINE__, "error: tools::view_map, map empty.\n");
+			error(__LINE__, "tools::view_map, map empty.\n");
 
 		for (auto it: map){
 			std::cout << it.first << " " << it.second << '\n';
@@ -85,7 +85,7 @@ namespace tools {
 	void to_upper(std::string& str)
 	{
 		if (str.empty())
-			error(__LINE__, "error: tools::to_upper, string empty.\n");
+			error(__LINE__, "tools::to_upper, string empty.\n");
 
 		std::locale loc;
 		for (std::string::size_type i = 0; i < str.length(); ++i)
@@ -95,7 +95,7 @@ namespace tools {
 	std::string upper(const std::string& str)
 	{
 		if (str.empty())
-			error(__LINE__, "error: tools::upper, string empty.\n");
+			error(__LINE__, "tools::upper, string empty.\n");
 
 		std::string str_upper(str);
 		to_upper(str_upper);
@@ -107,7 +107,7 @@ namespace tools {
 		const char& delimiter)
 	{
 		if (str.empty())
-			error(__LINE__, "error: tools::split, string empty.\n");
+			error(__LINE__, "tools::split, string empty.\n");
 
 		tokens.clear();
 		std::stringstream ss(str);
@@ -121,7 +121,7 @@ namespace tools {
 	std::vector<std::string> split(const std::string& str, const char& delimiter)
 	{
 		if (str.empty())
-			error(__LINE__, "error: tools::split, string empty.\n");
+			error(__LINE__, "tools::split, string empty.\n");
 
 		std::vector<std::string> tokens;
 		std::stringstream ss(str);
@@ -154,11 +154,10 @@ namespace tools {
 	{
 		if ((pos + key.length()) >= str.length())
 			error(__LINE__,
-				"error: tools::remove, (pos + key.length) >= string.length.\n");
+				"tools::remove, (pos + key.length) >= string.length.\n");
 
 		if (pos < 0 || pos > str.length())
-			error(__LINE__,
-				"error: tools::remove, pos > string.length.\n");
+			error(__LINE__, "tools::remove, pos > string.length.\n");
 
 		if (str.compare(pos, key.length(), key) == 0)
 			str.erase(pos, key.length());
@@ -177,7 +176,7 @@ namespace tools {
 	void split_path(const std::string& path, std::vector<std::string>& tokens)
 	{
 		if (path.empty())
-			error(__LINE__, "error: tools::split_path, path empty.\n");
+			error(__LINE__, "tools::split_path, path empty.\n");
 
 		std::vector<std::string> v_temp;
 		split(path, v_temp, char(47));
@@ -185,7 +184,7 @@ namespace tools {
 
 		size_t len =  path.size() - filename.size();
 		if (len <= 0)
-			error(__LINE__, "error: tools::split_path, path < filename.\n");
+			error(__LINE__, "tools::split_path, path < filename.\n");
 
 		std::string directory = path.std::string::substr(0, len);
 		split(filename, v_temp, char(46));
@@ -193,7 +192,7 @@ namespace tools {
 
 		len = filename.size() - filename_extension.size();
 		if (len <= 0)
-			error(__LINE__, "error: tools::split_path, filename < extension.\n");
+			error(__LINE__, "tools::split_path, filename < extension.\n");
 			
 		std::string name = filename.std::string::substr(0, len - 1);
 
@@ -278,13 +277,13 @@ namespace tools {
 		const char terminator = '\n';
 
 		if (v.empty())
-			error(__LINE__, "error: tools::save, vector empty.\n");
+			error(__LINE__, "tools::save, vector empty.\n");
 
 		std::string path_temp = path;
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			error(__LINE__, "error: tools::save, path empty.\n");
+			error(__LINE__, "tools::save, path empty.\n");
 
 		try {
 
@@ -297,7 +296,7 @@ namespace tools {
 			file_out.close();
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "error: tools::save, path failure.\n");
+			error(__LINE__, "tools::save, path failure.\n");
 		}
 	}
 
@@ -307,14 +306,14 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			error(__LINE__, "error: tools::save, path empty.\n");
+			error(__LINE__, "tools::save, path empty.\n");
 
 		try {
 			std::ofstream file_out(path_temp, std::ios::out);
 			file_out.close();
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "error: tools::save_new_file, path failure.\n");
+			error(__LINE__, "tools::save_new_file, path failure.\n");
 		}
 	}	
 
@@ -325,7 +324,7 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			error(__LINE__, "error: tools::write, path empty.\n");
+			error(__LINE__, "tools::write, path empty.\n");
 
 		try {
 			std::ofstream file_out(path, std::ios::app);
@@ -333,7 +332,7 @@ namespace tools {
 			file_out.close();		
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "error: tools::write, path failure.\n");
+			error(__LINE__, "tools::write, path failure.\n");
 		}
 	}
 
@@ -346,7 +345,7 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			error(__LINE__, "error: tools::load, path empty.\n");		
+			error(__LINE__, "tools::load, path empty.\n");		
 
 		try {
 
@@ -359,7 +358,7 @@ namespace tools {
 			filein.close();			
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "error: tools::load, path failure.\n");
+			error(__LINE__, "tools::load, path failure.\n");
 		}
 	}
 
@@ -397,13 +396,33 @@ namespace tools {
 			closedir(dir);
 		}
 		catch(const std::exception& e) {
-			error(__LINE__, "error: tools::files\n");
+			error(__LINE__, "tools::files\n");
 		}
 	}
 
 	bool exist_path(const std::string& path) {
 		struct stat info;
 		return (stat(path.c_str(), &info) == 0);
+	}
+
+	void create_directory(const std::string& folder)
+	{
+		try {
+			if (exist_path(folder)) {
+				std::cout << folder << " exist\n";
+				return;
+			}
+			
+			std::cout << "tools::create_directory, mkdir " << folder;
+			if (mkdir(folder.c_str(), S_IRWXU | S_IRWXG |
+				S_IROTH | S_IXOTH) == 0)
+				std::cout << " ok\n";
+			else
+				std::cout << " failure" << '\n';
+		}
+		catch(const std::exception& e) {
+			error(__LINE__, "tools::create_directory");
+		}
 	}
 };
 
