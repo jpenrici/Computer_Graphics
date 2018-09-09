@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <locale>
+#include <unistd.h>
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -20,14 +21,21 @@
 namespace tools {
 
 	/*
+	* Mensagem de erro
+	*/
+	void error(int line, const std::string& msg)
+	{
+		throw std::domain_error("[Line: " + std::to_string(line) + "]: " + msg);
+	}
+
+	/*
 	 *	VECTOR
 	 */
 	template<typename T>
 	void view_vector_line(const std::vector<T>& v, const std::string& separator)
 	{
 		if (v.empty())
-			throw std::domain_error(
-				"error: tools::view_vector_line, vector empty.");
+			error(__LINE__, "tools::view_vector_line, vector empty.\n");
 
 		for(int i = 0; i < v.size() - 1; ++i){
 			std::cout << v[i] << separator;
@@ -38,10 +46,6 @@ namespace tools {
 	template<typename T>
 	void view_vector(const std::vector<T>& v)
 	{
-		if (v.empty())
-			throw std::domain_error(
-				"error: tools::view_vector, vector empty.");
-
 		view_vector_line(v,";");
 	}
 
@@ -51,10 +55,11 @@ namespace tools {
 	std::string find_key(const std::string& key,
 		const std::unordered_map<std::string,std::string>& map)
 	{
+		std::string str("");
 		if (map.empty())
-			throw std::domain_error("error: tools::find_key, map empty.\n");
+			error(__LINE__, "error: tools::find_key, map empty.\n");
 		if (key.empty())
-			throw std::domain_error("error: tools::find_key, key empty.\n");
+			error(__LINE__, "error: tools::find_key, key empty.\n");
 
 		std::unordered_map<std::string,std::string>
 		::const_iterator it = map.find(key);
@@ -63,11 +68,11 @@ namespace tools {
 		return it->second;
 	}
 
-	template<typename TFIRST,typename TSECOND>
-	void view_map(const std::unordered_map<TFIRST,TSECOND>& map)
+	template<typename T_first,typename T_second>
+	void view_map(const std::unordered_map<T_first,T_second>& map)
 	{
 		if (map.empty())
-			throw std::domain_error("error: tools::view_map, map empty.\n");
+			error(__LINE__, "error: tools::view_map, map empty.\n");
 
 		for (auto it: map){
 			std::cout << it.first << " " << it.second << '\n';
@@ -80,7 +85,7 @@ namespace tools {
 	void to_upper(std::string& str)
 	{
 		if (str.empty())
-			throw std::domain_error("error: tools::to_upper, string empty.\n");
+			error(__LINE__, "error: tools::to_upper, string empty.\n");
 
 		std::locale loc;
 		for (std::string::size_type i = 0; i < str.length(); ++i)
@@ -90,7 +95,7 @@ namespace tools {
 	std::string upper(const std::string& str)
 	{
 		if (str.empty())
-			throw std::domain_error("error: tools::upper, string empty.\n");
+			error(__LINE__, "error: tools::upper, string empty.\n");
 
 		std::string str_upper(str);
 		to_upper(str_upper);
@@ -102,7 +107,7 @@ namespace tools {
 		const char& delimiter)
 	{
 		if (str.empty())
-			throw std::domain_error("error: tools::split, string empty.\n");
+			error(__LINE__, "error: tools::split, string empty.\n");
 
 		tokens.clear();
 		std::stringstream ss(str);
@@ -113,10 +118,10 @@ namespace tools {
 		}
 	}
 
-	std::vector<std::string> split (const std::string& str, const char& delimiter)
+	std::vector<std::string> split(const std::string& str, const char& delimiter)
 	{
 		if (str.empty())
-			throw std::domain_error("error: tools::split, string empty.\n");
+			error(__LINE__, "error: tools::split, string empty.\n");
 
 		std::vector<std::string> tokens;
 		std::stringstream ss(str);
@@ -148,11 +153,11 @@ namespace tools {
 	void remove_pos(const std::string& key, std::string& str, int pos) 
 	{
 		if ((pos + key.length()) >= str.length())
-			throw std::domain_error(
+			error(__LINE__,
 				"error: tools::remove, (pos + key.length) >= string.length.\n");
 
 		if (pos < 0 || pos > str.length())
-			throw std::domain_error(
+			error(__LINE__,
 				"error: tools::remove, pos > string.length.\n");
 
 		if (str.compare(pos, key.length(), key) == 0)
@@ -172,7 +177,7 @@ namespace tools {
 	void split_path(const std::string& path, std::vector<std::string>& tokens)
 	{
 		if (path.empty())
-			throw std::domain_error("error: tools::split_path, path empty.\n");
+			error(__LINE__, "error: tools::split_path, path empty.\n");
 
 		std::vector<std::string> v_temp;
 		split(path, v_temp, char(47));
@@ -180,8 +185,7 @@ namespace tools {
 
 		size_t len =  path.size() - filename.size();
 		if (len <= 0)
-			throw std::domain_error(
-				"error: tools::split_path, path < filename.\n");
+			error(__LINE__, "error: tools::split_path, path < filename.\n");
 
 		std::string directory = path.std::string::substr(0, len);
 		split(filename, v_temp, char(46));
@@ -189,8 +193,7 @@ namespace tools {
 
 		len = filename.size() - filename_extension.size();
 		if (len <= 0)
-			throw std::domain_error(
-				"error: tools::split_path, filename < extension.\n");
+			error(__LINE__, "error: tools::split_path, filename < extension.\n");
 			
 		std::string name = filename.std::string::substr(0, len - 1);
 
@@ -275,13 +278,13 @@ namespace tools {
 		const char terminator = '\n';
 
 		if (v.empty())
-			throw std::domain_error("error: tools::save, vector empty.\n");
+			error(__LINE__, "error: tools::save, vector empty.\n");
 
 		std::string path_temp = path;
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			throw std::domain_error("error: tools::save, path empty.\n");
+			error(__LINE__, "error: tools::save, path empty.\n");
 
 		try {
 
@@ -294,8 +297,7 @@ namespace tools {
 			file_out.close();
 		}
 		catch(const std::exception& e) {
-			std::cout << "error: tools::save, path failure.\n";
-			std::cout << e.what() << '\n';
+			error(__LINE__, "error: tools::save, path failure.\n");
 		}
 	}
 
@@ -305,15 +307,14 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			throw std::domain_error("error: tools::save, path empty.\n");
+			error(__LINE__, "error: tools::save, path empty.\n");
 
 		try {
 			std::ofstream file_out(path_temp, std::ios::out);
 			file_out.close();
 		}
 		catch(const std::exception& e) {
-			std::cout << "error: tools::save_new_file, path failure.\n";
-			std::cout << e.what() << '\n';
+			error(__LINE__, "error: tools::save_new_file, path failure.\n");
 		}
 	}	
 
@@ -324,7 +325,7 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			throw std::domain_error("error: tools::write, path empty.\n");
+			error(__LINE__, "error: tools::write, path empty.\n");
 
 		try {
 			std::ofstream file_out(path, std::ios::app);
@@ -332,8 +333,7 @@ namespace tools {
 			file_out.close();		
 		}
 		catch(const std::exception& e) {
-			std::cout << "error: tools::write, path failure.\n";
-			std::cout << e.what() << '\n';
+			error(__LINE__, "error: tools::write, path failure.\n");
 		}
 	}
 
@@ -346,7 +346,7 @@ namespace tools {
 		while(path_temp[0] == char(32)) path_temp.erase(path_temp.begin());
 
 		if (path_temp.empty())
-			throw std::domain_error("error: tools::load, path empty.\n");		
+			error(__LINE__, "error: tools::load, path empty.\n");		
 
 		try {
 
@@ -359,8 +359,7 @@ namespace tools {
 			filein.close();			
 		}
 		catch(const std::exception& e) {
-			std::cout << "error: tools::load, path failure.\n";
-			std::cout << e.what() << '\n';
+			error(__LINE__, "error: tools::load, path failure.\n");
 		}
 	}
 
@@ -398,9 +397,13 @@ namespace tools {
 			closedir(dir);
 		}
 		catch(const std::exception& e) {
-			std::cout << "error: tools::files\n";
-			std::cout << e.what() << '\n';
+			error(__LINE__, "error: tools::files\n");
 		}
+	}
+
+	bool exist_path(const std::string& path) {
+		struct stat info;
+		return (stat(path.c_str(), &info) == 0);
 	}
 };
 
