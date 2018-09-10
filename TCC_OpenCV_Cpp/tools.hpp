@@ -37,7 +37,7 @@ namespace tools {
 		if (v.empty())
 			error(__LINE__, "tools::view_vector_line, vector empty.\n");
 
-		for(int i = 0; i < v.size() - 1; ++i){
+		for(size_t i = 0; i < v.size() - 1; ++i){
 			std::cout << v[i] << separator;
 		}
 		std::cout << v[v.size() - 1];
@@ -111,6 +111,27 @@ namespace tools {
 
 		return str_upper;
 	}
+
+	void to_lower(std::string& str)
+	{
+		if (str.empty())
+			error(__LINE__, "tools::to_lower, string empty.\n");
+
+		std::locale loc;
+		for (std::string::size_type i = 0; i < str.length(); ++i)
+			str[i] = std::tolower(str[i], loc);
+	}
+
+	std::string lower(const std::string& str)
+	{
+		if (str.empty())
+			error(__LINE__, "tools::lower, string empty.\n");
+
+		std::string str_lower(str);
+		to_lower(str_lower);
+
+		return str_lower;
+	}	
 
 	void split(const std::string& str, std::vector<std::string>& tokens,
 		const char& delimiter)

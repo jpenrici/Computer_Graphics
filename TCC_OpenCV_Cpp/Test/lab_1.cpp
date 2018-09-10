@@ -19,7 +19,7 @@ string search_path(const string& format, vector<vector<string> >& v)
 {
 	// Sem tratamento de erros, por enquanto.
 	for (auto path: v){
-		// std::cout << path.front() << " " << path.back() << '\n';
+		// cout << path.front() << " " << path.back() << '\n';
 		if (path.front() == format) return path.back();
 	}
 	return "EMPTY";
@@ -41,7 +41,7 @@ int main ()
 	 */
 
 	// definições iniciais
-	std::vector<std::vector<std::string> > v_map;
+	vector<vector<string> > v_map;
 	string image = "../Images/images_test/leaf_diseases.jpg";	// original
 
 	// inicializando workspace com a imagem e
@@ -50,16 +50,16 @@ int main ()
 	save_imgp(image, "LAB1");
 
 	// aproveitando estado inicial da variável global do image_tools.hpp
-	std::cout << "info -> " << imgp_path << '\n';
+	cout << "info -> " << imgp_path << '\n';
 
 	// verificando se imgp_path foi salvo
 	if (!tools::exist_path(imgp_path)) {
-		std::cout << "IMGP failure!" << '\n';
+		cout << "IMGP failure!" << '\n';
 		exit(0);
 	} 	
 
 	// inserindo texto dica, aproveitando o token ':' (separador)
-	std::string text(
+	string text(
 	":\n"
 	": Laboratório básico\n"
 	":\n"
@@ -73,12 +73,12 @@ int main ()
 	tools::write(text, imgp_path);
 
 	// ler arquivo .imgp gerado para testar imagens pelo OpenCV
-	std::cout << "Load .imgp : " << image << '\n';
+	cout << "Reload .imgp : " << image << '\n';
 	v_map = load_imgp(imgp_path);
 
 	// OPENCV - ORIGINAL
-	std::string path_ori = search_path("ORIGINAL", v_map);
-	std::cout << "Selected image: " << path_ori << '\n';
+	string path_ori = search_path("ORIGINAL", v_map);
+	cout << "Path image: " << path_ori << '\n';
 
 	Mat src_ori;
 	src_ori = imread(path_ori, IMREAD_COLOR);
@@ -94,14 +94,14 @@ int main ()
 	waitKey(8000);	// 8 segundos de espera
 
 	// OPENCV - COPY
-	std::string path_cp = search_path("COPY", v_map);
-	std::cout << "Selected image: " << path_cp << '\n';
+	string path_cp = search_path("COPY", v_map);
+	cout << "Path image: " << path_cp << '\n';
 
 	imwrite(path_cp, src_ori);	// cópia de segurança
 
 	// OPENCV - GRAYSCALE
-	std::string path_gray = search_path("GRAYSCALE", v_map);
-	std::cout << "Selected image: " << path_gray << '\n';
+	string path_gray = search_path("GRAYSCALE", v_map);
+	cout << "Path image: " << path_gray << '\n';
 
 	Mat src_gray(src_ori.size(), CV_8U);
 	cvtColor(src_ori, src_gray, CV_BGR2GRAY);
@@ -112,8 +112,8 @@ int main ()
 	waitKey(8000);
 
 	// OPENCV - BINARY
-	std::string path_bin = search_path("BINARY", v_map);
-	std::cout << "Selected image: " << path_bin << '\n';
+	string path_bin = search_path("BINARY", v_map);
+	cout << "Path image: " << path_bin << '\n';
 
 	Mat src_bin(src_gray.size(), src_gray.type());
 	threshold(src_gray, src_bin, 80, 149, THRESH_BINARY);
@@ -124,8 +124,8 @@ int main ()
 	waitKey(8000);
 
 	// OPENCV - BINARY_INV
-	std::string path_bin_inv = search_path("BINARY_INV", v_map);
-	std::cout << "Selected image: " << path_bin_inv << '\n';
+	string path_bin_inv = search_path("BINARY_INV", v_map);
+	cout << "Path image: " << path_bin_inv << '\n';
 
 	Mat src_bin_inv(src_gray.size(), src_gray.type());
 	threshold(src_gray, src_bin_inv, 100, 150, THRESH_BINARY_INV);
