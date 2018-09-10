@@ -20,7 +20,8 @@ namespace img_tools {
 	static const std::string METHOD = "M0_";
 
 	static const std::unordered_map<std::string, std::string> map_default = {
-		{"ORIGINAL"  , "/original"},
+		{"ORIGINAL"  , "."},
+		{"COPY"      , "/original"},
 		{"GRAYSCALE" , "/grayscale"},
 		{"BINARY"    , "/binary"},
 		{"BINARY_INV", "/binary_inv"}
@@ -73,16 +74,10 @@ namespace img_tools {
 		return true;
 	}
 
-	void create_workspace(const std::string& new_workspace = workspace, 
-		const std::unordered_map<std::string, std::string>&
-		map_work = map_default)
+	void create_workspace(const std::string& new_workspace, 
+		const std::unordered_map<std::string, std::string>& map_work)
 	{
 		try {
-			if (exist_workspace(new_workspace)) {
-				std::cout << new_workspace << " exist. don't created!\n";
-				return;
-			}
-
 			if (new_workspace.empty()) {
 				std::cout << "string new_workspace empty!\n";
 				return;
@@ -90,6 +85,10 @@ namespace img_tools {
 
 			if (map_work.empty()) {
 				std::cout << "map empty!\n";
+			}
+
+			if (exist_workspace(new_workspace)) {
+				std::cout << new_workspace << " exist. don't created!\n";
 				return;
 			}
 
@@ -98,6 +97,7 @@ namespace img_tools {
 			tools::create_directory(new_workspace + WORKSPACE_OUT);
 
 			for (auto it : map_work) {
+				if (it.first == "ORIGINAL") continue;
 				tools::create_directory(new_workspace + WORKSPACE_OUT
 					+ std::string(it.second));
 			}
@@ -109,10 +109,18 @@ namespace img_tools {
 		}
 	}
 
+	void create_workspace(){
+		create_workspace(workspace, map_default);
+	}
+
+	void create_workspace(const std::string& new_workspace)
+	{
+		create_workspace(new_workspace, map_default);
+	}
+
 	void save_imgp(const std::string& file_image,
-		const std::string& new_workspace = workspace,
-		const std::unordered_map<std::string, std::string>&
-		map_work = map_default)
+		const std::string& new_workspace,
+		const std::unordered_map<std::string, std::string>&	map_work)
 	{
 		try {
 			if (new_workspace.empty()) {
@@ -139,11 +147,17 @@ namespace img_tools {
 				+ name + ".imgp";
 			std::cout << "save .imgp: " << imgp_path;
 			tools::save_new_file(imgp_path);
+			tools::write("IMGP:" + imgp_path + "\n", imgp_path);
 
 			for (auto it: map_work) {
-				path_temp = std::string(it.first) + ":" + new_workspace
-					+ WORKSPACE_OUT + std::string(it.second) + "/"
-					+ filename + "\n";
+				if (it.first == "ORIGINAL") {
+					path_temp = "ORIGINAL:" + file_image + "\n";
+				}
+				else {
+					path_temp = std::string(it.first) + ":" + new_workspace
+						+ WORKSPACE_OUT + std::string(it.second) + "/"
+						+ filename + "\n";
+				}
 				tools::write(path_temp, imgp_path);
 			}
 			tools::write("WORKSPACE:" + new_workspace + "\n", imgp_path);
@@ -153,6 +167,11 @@ namespace img_tools {
 		catch(const std::exception& e) {
 			error(__LINE__, "img_tools::create_imgp");
 		}		
+	}
+
+	void save_imgp(const std::string& file_image, const std::string& new_workspace)
+	{
+		save_imgp(file_image, new_workspace, map_default);
 	}
 
 	std::vector<std::vector<std::string> > load_imgp(const std::string& file_imgp)

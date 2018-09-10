@@ -143,7 +143,7 @@ namespace tools {
 		return tokens;
 	}
 
-	bool match_pos(const std::string& key, const std::string& str, int pos)
+	bool match_pos(const std::string& key, const std::string& str, unsigned pos)
 	{
 		if ((pos + key.length()) > str.length()) return false;
 		if (pos < 0 || pos > str.length()) return false;
@@ -159,7 +159,7 @@ namespace tools {
 		return match_pos(key, str, 0);
 	}	
 
-	void remove_pos(const std::string& key, std::string& str, int pos) 
+	void remove_pos(const std::string& key, std::string& str, unsigned pos) 
 	{
 		if ((pos + key.length()) >= str.length())
 			error(__LINE__,
