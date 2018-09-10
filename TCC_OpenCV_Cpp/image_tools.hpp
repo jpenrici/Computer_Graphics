@@ -46,7 +46,7 @@ namespace img_tools {
 	void validate (const std::string& file_image)
 	{
 		if (!tools::check_extension(tools::upper(extension), map_extension))
-			error(__LINE__, "img_tools::validate, invalid file_image in.\n");		
+			error(__LINE__, "img_tools::validate, invalid file_image.\n");		
 	}
 
 	void info_path(const std::string& file_image)
@@ -67,7 +67,7 @@ namespace img_tools {
 	bool exist_workspace(const std::string& new_workspace)
 	{
 		if (!tools::exist_path(new_workspace)) {
-			std::cout << "Workspace don't exist!\n";
+			std::cout << new_workspace << " don't exist!\n";
 			return false;
 		}
 		return true;
@@ -78,15 +78,18 @@ namespace img_tools {
 		map_work = map_default)
 	{
 		try {
-			if (exist_workspace(new_workspace)) return;
+			if (exist_workspace(new_workspace)) {
+				std::cout << new_workspace << " exist. don't created!\n";
+				return;
+			}
 
 			if (new_workspace.empty()) {
-				std::cout << "string workspace empty!\n";
+				std::cout << "string new_workspace empty!\n";
 				return;
 			}
 
 			if (map_work.empty()) {
-				std::cout << "map currently empty!\n";
+				std::cout << "map empty!\n";
 				return;
 			}
 
@@ -98,6 +101,8 @@ namespace img_tools {
 				tools::create_directory(new_workspace + WORKSPACE_OUT
 					+ std::string(it.second));
 			}
+
+			std::cout << new_workspace << " ... ok\n";
 		}
 		catch(const std::exception& e) {
 			error(__LINE__, "img_tools::create_workspace");
@@ -110,8 +115,22 @@ namespace img_tools {
 		map_work = map_default)
 	{
 		try {
+			if (new_workspace.empty()) {
+				std::cout << "string new_workspace empty!\n";
+				return;
+			}
+
+			if (map_work.empty()) {
+				std::cout << "map empty!\n";
+				return;
+			}
+
 			if (!exist_workspace(new_workspace))
-				create_workspace(new_workspace);
+				create_workspace(new_workspace, map_work);
+			else {
+				std::cout << "Check directories and workspace"
+					<< " before changing the map.\n";
+			}		
 
 			info_path(file_image);
 			validate(file_image);			
@@ -138,10 +157,14 @@ namespace img_tools {
 
 	std::vector<std::vector<std::string> > load_imgp(const std::string& file_imgp)
 	{
+		if (!tools::check_filename_extension(file_imgp, "imgp"))
+			std::cout << "it is not .imgp" << '\n';
+
 		std::vector<std::string> lines, word;
 		std::vector<std::vector<std::string> > result {{"EMPTY"}};
 		try {
 			tools::load(file_imgp, lines);
+			result.clear();
 			for (std::string line : lines) {
 				tools::split(line, word, ':');
 				result.push_back(word);

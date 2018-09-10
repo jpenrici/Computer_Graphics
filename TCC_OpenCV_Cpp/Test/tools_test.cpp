@@ -10,7 +10,7 @@ using namespace tools;
 
 inline void test(int line, int t, string msg)
 {
-	cout << "\n\t\t\t[ Line: " << line << ", Test: "
+	cout << "\n[ Line: " << line << ", Test: "
 		<< t << " , " << msg << "]\n";
 }
 
@@ -40,6 +40,10 @@ int main()
 	vector<double> v {1.2, 1.3};
 	view_vector(v);
 	cout << '\n';
+
+	test(__LINE__, t++, "view_vector_2D");
+	vector<int> v_int {1, 2, 3, 4, 5};
+	view_vector_2D(vector<vector<int> >{v_int, v_int});
 
 	// minúscula para maiúscula
 	test(__LINE__, t++, "to_upper, upper");	
@@ -151,7 +155,7 @@ int main()
 	// incluir texto no arquivo
 	test(__LINE__, t++, "write");	
 	try {
-		write(double(100.123), "output_file");
+		write("arquivo teste", "output_file");
 		write('\n', "output_file");
 		write(double(99999.123), "output_file");
 		cout << "write ok" << '\n';
@@ -184,6 +188,17 @@ int main()
 
 	test(__LINE__, t++, "view_map");
 	view_map(map_extension);
+
+	// checar se path existe
+	test(__LINE__, t++, "exist_path");
+	cout << boolalpha 
+		 << exist_path("/home");
+
+	// criar diretórios
+	test(__LINE__, t++, "create_directory");
+	create_directory("../Workspace");
+	create_directory("../Workspace/imgp");
+	create_directory("../Workspace/output/other/other");
 
 	return 0;
 }
