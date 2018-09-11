@@ -200,5 +200,12 @@ int main()
 	create_directory("../Workspace/imgp");
 	create_directory("../Workspace/output/other/other");
 
+	// remover extensão
+	test(__LINE__, t++, "add_suffix_filename");
+	string p = "directory/directory/filename.png";
+	cout << p << '\n';
+	add_suffix_filename(p, "_new");
+	cout << p << '\n';	
+
 	return 0;
 }

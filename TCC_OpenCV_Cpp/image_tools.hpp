@@ -1,5 +1,5 @@
 /*
- * Methods For Recording Images
+ * Métodos para facilitar a gerência das imagens
  */
 #ifndef IMAGE_TOOLS_HPP
 #define IMAGE_TOOLS_HPP
@@ -13,7 +13,7 @@
 
 namespace img_tools {
 	
-	// padrão
+	// Padrão
 	static const std::string WORKSPACE = "Workspace";
 	static const std::string WORKSPACE_IMGP = "/imgp";
 	static const std::string WORKSPACE_OUT = "/output";
@@ -32,7 +32,7 @@ namespace img_tools {
 		{"PNG", "png"}, {"JPG", "jpg"}, {"JPEG", "jpeg"},
 	};
 
-	// configuração inicial - variáveis públicas
+	// Configuração inicial - variáveis públicas
 	std::vector<std::string> info;
 	std::string directory, filename, extension, name;
 	std::string workspace(WORKSPACE);
@@ -109,7 +109,8 @@ namespace img_tools {
 		}
 	}
 
-	void create_workspace(){
+	void create_workspace()
+	{
 		create_workspace(workspace, map_default);
 	}
 

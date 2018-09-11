@@ -1,5 +1,5 @@
 /*
- * Common Methods
+ * Métodos Comuns
  */
 #ifndef TOOLS_HPP
 #define TOOLS_HPP
@@ -29,7 +29,7 @@ namespace tools {
 	}
 
 	/*
-	 *	VECTOR
+	 * Manipulação de Vetor
 	 */
 	template<typename T>
 	void view_vector_line(const std::vector<T>& v, const std::string& separator)
@@ -59,7 +59,7 @@ namespace tools {
 	}	
 
 	/*
-	 * MAP
+	 * Manipulação de MAPs
 	 */
 	std::string find_key(const std::string& key,
 		const std::unordered_map<std::string,std::string>& map)
@@ -89,7 +89,7 @@ namespace tools {
 	}
 
 	/*
-	 *	STRING
+	 *	Manipulação de STRING
 	 */
 	void to_upper(std::string& str)
 	{
@@ -201,7 +201,7 @@ namespace tools {
 	}
 
 	/*
-	 *	STRING: PATH, DIRECTORY, FILENAME
+	 *	STRING -> PATH, DIRECTORY, FILENAME
 	 */
 	void split_path(const std::string& path, std::vector<std::string>& tokens)
 	{
@@ -301,6 +301,22 @@ namespace tools {
 		return true;
 	}
 
+	void add_suffix_filename(std::string& src, std::string new_src)
+	{
+		std::string src_temp("");
+		while(src.back() != '.') {
+			src_temp = src.back() + src_temp;
+			src.pop_back();
+		}
+		src.pop_back();
+		src.append(new_src);
+		src.push_back('.');
+		src.append(src_temp);
+	}
+
+	/*
+	 *	Manipulação de arquivos
+	 */	
 	template<typename T>
 	void save(const std::vector<T>& v, const std::string& path)
 	{
