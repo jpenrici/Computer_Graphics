@@ -1,8 +1,17 @@
-#include "opencv2/photo.hpp"		// computational photography
-#include "opencv2/imgproc.hpp"		// image processing
-#include "opencv2/imgcodecs.hpp"	// image I/O
-#include "opencv2/highgui.hpp"		// high level GUI and Media
-#include "opencv2/core.hpp"			// core functionality
+/*
+ * Laboratório 3
+ *
+ * Workspace LAB3
+ *
+ * Fazer binarização com limites variáveis.
+ *
+ */
+
+#include "opencv2/photo.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/core.hpp"
 
 #include "../image_tools.hpp"
 
@@ -13,21 +22,10 @@ using namespace std;
 using namespace cv;
 using namespace img_tools;
 
-#define THMIN 70
-#define THMAX 220
+#define MIN_VALUE 70
+#define MAX_VALUE 220
 #define STEP 15
 
-/*
- * Laboratório 3
- *
- * Uso da configuração de mapa padrão
- * ORIGINAL, COPY, GRAYSCALE, BINARY, BINARY_INV
- *
- * Workspace LAB3
- *
- * Fazer binarização com limites variáveis
- *
- */
 string search_path(const string& format, vector<vector<string> >& v)
 {
 	for (auto path: v) {
@@ -48,31 +46,33 @@ void create_imgp_base(const string& workspace, const vector<string>& images,
 
 void method_threshold(Mat& src_gray, vector<vector<string> >& v_map) {
 
-	for (int i = THMIN; i < THMAX; i += STEP) {
+	for (int i = MIN_VALUE; i < MAX_VALUE; i += STEP) {
 
 		// OPENCV - BINARY
 		string path_bin = search_path("BINARY", v_map);
-		tools::add_suffix_filename(path_bin, "_" + to_string(i));
+		tools::add_suffix_filename(path_bin, "_" + to_string(i)
+			+ "-" + to_string(MAX_VALUE));		
 		cout << "OPENCV BINARY: " << path_bin << '\n';
 
 		Mat src_bin(src_gray.size(), src_gray.type());
-		threshold(src_gray, src_bin, i, THMAX - i, THRESH_BINARY);
+		threshold(src_gray, src_bin, i, MAX_VALUE, THRESH_BINARY);
 
 		imwrite(path_bin, src_bin);
 
 		// OPENCV - BINARY_INV
 		string path_bin_inv = search_path("BINARY_INV", v_map);
-		tools::add_suffix_filename(path_bin_inv, "_inv_" + to_string(i));
+		tools::add_suffix_filename(path_bin_inv, "_" + to_string(i)
+			+ "-" + to_string(MAX_VALUE));			
 		cout << "OPENCV BINARY_INV: " << path_bin_inv << '\n';
 
 		Mat src_bin_inv(src_gray.size(), src_gray.type());
-		threshold(src_gray, src_bin_inv, i, THMAX - i, THRESH_BINARY_INV);
+		threshold(src_gray, src_bin_inv, i, MAX_VALUE, THRESH_BINARY_INV);
 
 		imwrite(path_bin_inv, src_bin_inv);
 	}
 }	
 
-void method_basic(const vector<string>& images) {
+void method_main(const vector<string>& images) {
 
 	vector<vector<string> > v_map;
 	for (auto image: images) {
@@ -112,7 +112,7 @@ void method_basic(const vector<string>& images) {
 		cvtColor(src_ori, src_gray, CV_BGR2GRAY);
 		imwrite(path_gray, src_gray);
 
-		// Método Threshold variado	
+		// Método Threshold
 		method_threshold(src_gray, v_map);
 
 	}
@@ -141,7 +141,7 @@ void image_processing_basic(const string& new_workspace, const string& folder,
 
 	// passo 5 - processar para cada .imgp as imagens
 	tools::files(images, new_workspace + "/imgp");
-	method_basic(images);	
+	method_main(images);	
 }
 
 int main()

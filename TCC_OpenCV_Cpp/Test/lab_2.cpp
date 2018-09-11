@@ -1,8 +1,17 @@
-#include "opencv2/photo.hpp"		// computational photography
-#include "opencv2/imgproc.hpp"		// image processing
-#include "opencv2/imgcodecs.hpp"	// image I/O
-#include "opencv2/highgui.hpp"		// high level GUI and Media
-#include "opencv2/core.hpp"			// core functionality
+/*
+ * Laboratório 2
+ *
+ * Workspace LAB2
+ *
+ * Objetivo trabalhar com lote de imagens.
+ *
+ */
+
+#include "opencv2/photo.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/core.hpp"
 
 #include "../image_tools.hpp"
 
@@ -13,17 +22,6 @@ using namespace std;
 using namespace cv;
 using namespace img_tools;
 
-/*
- * Laboratório 2
- *
- * Uso da configuração de mapa padrão
- * ORIGINAL, COPY, GRAYSCALE, BINARY, BINARY_INV
- *
- * Workspace LAB2
- *
- * Objetivo trabalhar com lote de imagens
- *
- */
 string search_path(const string& format, vector<vector<string> >& v)
 {
 	for (auto path: v) {
@@ -45,6 +43,7 @@ void create_imgp_base(const string& workspace, const vector<string>& images,
 void method_basic(const vector<string>& images) {
 
 	vector<vector<string> > v_map;
+
 	for (auto image: images) {
 		
 		if (!tools::exist_path(image)) {

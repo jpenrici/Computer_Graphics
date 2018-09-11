@@ -1,0 +1,7 @@
+IMGP:LAB4/imgp/lab4_Anthurium_alpha.imgp
+GREEN:LAB4/output/green/Anthurium_alpha.png
+ORIGINAL:../Images/images_test/Anthurium/Anthurium_alpha.png
+GRAYSCALE:LAB4/output/grayscale/Anthurium_alpha.png
+COPY:LAB4/output/original/Anthurium_alpha.png
+BINARY:LAB4/output/binary/Anthurium_alpha.png
+WORKSPACE:LAB4

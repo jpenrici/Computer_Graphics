@@ -1,0 +1,7 @@
+IMGP:LAB3/imgp/lab3_leaf_diseases.imgp
+BINARY_INV:LAB3/output/binary_inv/leaf_diseases.png
+ORIGINAL:../Images/images_test/leaf_diseases.png
+GRAYSCALE:LAB3/output/grayscale/leaf_diseases.png
+COPY:LAB3/output/original/leaf_diseases.png
+BINARY:LAB3/output/binary/leaf_diseases.png
+WORKSPACE:LAB3
