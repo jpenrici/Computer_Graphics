@@ -70,7 +70,7 @@ int main ()
 	tools::write(text, imgp_path);
 
 	// ler arquivo .imgp gerado para testar imagens pelo OpenCV
-	cout << "Reload .imgp : " << image << '\n';
+	cout << "Reload .imgp : " << imgp_path << '\n';
 	v_map = load_imgp(imgp_path);
 
 	// OPENCV - ORIGINAL
