@@ -6,7 +6,7 @@
  * Workspace LAB4
  *
  * Teste com foto real e com fundos retirados no GIMP.
- * Objetivo detectar a cor verde.
+ * Objetivo detectar as manchas nas folhas.
  *
  */
 
@@ -25,18 +25,18 @@ using namespace std;
 using namespace cv;
 using namespace img_tools;
 
-#define MIN_VALUE 160
-#define MAX_VALUE 180
+#define MIN_VALUE 180
+#define MAX_VALUE 255
 
-static const std::unordered_map<std::string, std::string> map_lab4 = {
+static const std::unordered_map<std::string, std::string> map_lab = {
 	{"ORIGINAL"  , "."},
 	{"COPY"      , "/original"},
 	{"GRAYSCALE" , "/grayscale"},
-	{"BINARY"    , "/binary"},
-	{"GREEN"     , "/green"},
+	{"BINARY_INV", "/binary_inv"},
+	{"SPOT"      , "/spot"},
 };
 
-Mat src_ori, src_gray, src_bin, src_hsv, src_green;
+Mat src_ori, src_gray, src_bin_inv, src_hsv, src_spot;
 vector<vector<string> > v_map;
 
 string search_path(const string& format, vector<vector<string> >& v)
@@ -53,7 +53,7 @@ void create_imgp_base(const string& workspace, const vector<string>& images,
 	for (auto image: images) {
 		if (!tools::check_filename_extension(image, ext)) continue;
 		cout << "image: " << image << '\n';
-		save_imgp(image, workspace, map_lab4);
+		save_imgp(image, workspace, map_lab);
 	}
 }
 
@@ -85,31 +85,34 @@ void method_basic() {
 
 void method_threshold() {
 
-		// OPENCV - BINARY
-		string path_bin = search_path("BINARY", v_map);
-		tools::add_suffix_filename(path_bin, "_" + to_string(MIN_VALUE)
+		// OPENCV - BINARY_INV
+		string path_bin_inv = search_path("BINARY_INV", v_map);
+		tools::add_suffix_filename(path_bin_inv, "_" + to_string(MIN_VALUE)
 			+ "-" + to_string(MAX_VALUE));
-		cout << "OPENCV BINARY: " << path_bin << '\n';
+		cout << "OPENCV BINARY_INV: " << path_bin_inv << '\n';
 
-		threshold(src_gray, src_bin, MIN_VALUE, MAX_VALUE, THRESH_BINARY);
-		imwrite(path_bin, src_bin);
+		threshold(src_gray, src_bin_inv, MIN_VALUE, MAX_VALUE, THRESH_BINARY_INV);
+		imwrite(path_bin_inv, src_bin_inv);
 }
 
 void method_hsv() {
 
 	// OPENCV - HSV
-	string path_green = search_path("GREEN", v_map);
-	cout << "OPENCV HSV:" << path_green << '\n';
+	string path_spot = search_path("SPOT", v_map);
+	cout << "OPENCV HSV:" << path_spot << '\n';
 
 	cvtColor(src_ori, src_hsv, CV_BGR2HSV);
 
-	string path_hsv = path_green;
+	string path_hsv = path_spot;
 	tools::add_suffix_filename(path_hsv, "_hsv");
 	imwrite(path_hsv, src_hsv);
 
-	inRange(src_hsv, Scalar(38, 0, 0), Scalar(70, 255, 255), src_green);
-	tools::add_suffix_filename(path_green, "_green");
-	imwrite(path_green, src_green);
+	Mat src_temp;
+	inRange(src_hsv, Scalar(20, 10, 10), Scalar(90, 255, 255), src_temp);
+	bitwise_not(src_temp, src_spot, src_bin_inv);
+
+	tools::add_suffix_filename(path_spot, "_spot");
+	imwrite(path_spot, src_spot);
 }
 
 void method_main(const vector<string>& images) {
@@ -143,7 +146,7 @@ void image_processing(const string& new_workspace, const string& folder,
 
 	// passo 2 - criar workspace com MAP customizado
 	method_name = tools::lower(new_workspace) + "_";
-	create_workspace(new_workspace, map_lab4);
+	create_workspace(new_workspace, map_lab);
 
 	// passo 3 - listar arquivos de imagens alvo
 	vector<string> images;
@@ -160,7 +163,7 @@ void image_processing(const string& new_workspace, const string& folder,
 
 int main()
 {
-	image_processing("LAB4", "../Images/images_test/Anthurium", "jpg");
+	image_processing("LAB4", "../Images/images_test", "jpg");
 
 	return 0;
 }
