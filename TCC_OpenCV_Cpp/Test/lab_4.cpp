@@ -160,7 +160,7 @@ void image_processing(const string& new_workspace, const string& folder,
 
 int main()
 {
-	image_processing("LAB4", "../Images/images_test/Anthurium", "png");
+	image_processing("LAB4", "../Images/images_test/Anthurium", "jpg");
 
 	return 0;
 }

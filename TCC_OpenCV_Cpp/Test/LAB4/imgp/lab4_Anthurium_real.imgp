@@ -1,7 +1,0 @@
-IMGP:LAB4/imgp/lab4_Anthurium_real.imgp
-GREEN:LAB4/output/green/Anthurium_real.png
-ORIGINAL:../Images/images_test/Anthurium/Anthurium_real.png
-GRAYSCALE:LAB4/output/grayscale/Anthurium_real.png
-COPY:LAB4/output/original/Anthurium_real.png
-BINARY:LAB4/output/binary/Anthurium_real.png
-WORKSPACE:LAB4

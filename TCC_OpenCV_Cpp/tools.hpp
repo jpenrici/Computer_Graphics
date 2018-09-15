@@ -470,6 +470,6 @@ namespace tools {
 			error(__LINE__, "tools::create_directory");
 		}
 	}
-};
+} // namespace tools
 
 #endif // TOOLS_HPP

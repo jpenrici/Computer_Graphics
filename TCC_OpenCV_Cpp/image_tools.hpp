@@ -27,12 +27,11 @@ namespace img_tools {
 		{"BINARY_INV", "/binary_inv"}
 	};	
 
-	static const std::unordered_map<std::string, std::string>
-	map_extension = {
+	static const std::unordered_map<std::string, std::string> map_extension = {
 		{"PNG", "png"}, {"JPG", "jpg"}, {"JPEG", "jpeg"},
 	};
 
-	// Configuração inicial - variáveis públicas
+	// Variáveis globais
 	std::vector<std::string> info;
 	std::string directory, filename, extension, name;
 	std::string workspace(WORKSPACE);
@@ -60,9 +59,9 @@ namespace img_tools {
 		}
 		
 		directory = info[0];
-		filename = info[1];
+		filename  = info[1];
 		extension = info[2];
-		name = info[3];
+		name      = info[3];
 	}	
 
 	bool exist_workspace(const std::string& new_workspace)
@@ -136,10 +135,10 @@ namespace img_tools {
 
 			if (!exist_workspace(new_workspace))
 				create_workspace(new_workspace, map_work);
-			else {
-				std::cout << "Check directories and workspace"
-					<< " before changing the map.\n";
-			}		
+			// else {
+			// 	std::cout << "Check directories and workspace"
+			// 		<< " before changing the map.\n";
+			// }		
 
 			info_path(file_image);
 			validate(file_image);			
@@ -195,6 +194,6 @@ namespace img_tools {
 		}
 		return result;
 	}
-};
+} // namespace img_tools
 
 #endif // IMAGE_TOOLS_HPP

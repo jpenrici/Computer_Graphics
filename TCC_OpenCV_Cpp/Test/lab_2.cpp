@@ -7,7 +7,7 @@
  *
  */
 
-#include "opencv2/photo.hpp"
+// #include "opencv2/photo.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
@@ -129,7 +129,7 @@ void image_processing_basic(const string& new_workspace, const string& folder,
 
 int main()
 {
-	image_processing_basic("LAB2", "../Images/images_test/leafs", "jpg");
+	image_processing_basic("LAB2", "../Images/images_test/leafs", "png");
 
 	return 0;
 }

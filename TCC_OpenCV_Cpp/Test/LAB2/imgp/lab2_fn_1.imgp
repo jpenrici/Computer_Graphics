@@ -1,7 +1,0 @@
-IMGP:LAB2/imgp/lab2_fn_1.imgp
-BINARY_INV:LAB2/output/binary_inv/fn_1.jpg
-ORIGINAL:../Images/images_test/leafs/fn_1.jpg
-GRAYSCALE:LAB2/output/grayscale/fn_1.jpg
-COPY:LAB2/output/original/fn_1.jpg
-BINARY:LAB2/output/binary/fn_1.jpg
-WORKSPACE:LAB2

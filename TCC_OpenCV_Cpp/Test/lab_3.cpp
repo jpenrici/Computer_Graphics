@@ -23,8 +23,8 @@ using namespace cv;
 using namespace img_tools;
 
 #define MIN_VALUE 70
-#define MAX_VALUE 220
-#define STEP 15
+#define MAX_VALUE 200
+#define STEP 20
 
 string search_path(const string& format, vector<vector<string> >& v)
 {
@@ -146,7 +146,7 @@ void image_processing_basic(const string& new_workspace, const string& folder,
 
 int main()
 {
-	image_processing_basic("LAB3", "../Images/images_test", "png");
+	image_processing_basic("LAB3", "../Images/images_test/Anthurium", "jpg");
 
 	return 0;
 }

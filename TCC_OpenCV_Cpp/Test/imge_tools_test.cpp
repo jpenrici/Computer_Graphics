@@ -70,7 +70,4 @@ void test_2()
 	// irá escrever no .imgp somente o mapa padrão
 	test(__LINE__);
 	img_tools::save_imgp("Images/images_test/leafs/f4.png", "Work_LAB1");	
-	
-	// Não permitido
-	// img_tools::save_imgp("Images/images_test/leafs/f5.png", map_lab);
 }

@@ -11,7 +11,7 @@
  * da imagem.
  */
 
-#include "opencv2/photo.hpp"		// computational photography
+// #include "opencv2/photo.hpp"		// computational photography
 #include "opencv2/imgproc.hpp"		// image processing
 #include "opencv2/imgcodecs.hpp"	// image I/O
 #include "opencv2/highgui.hpp"		// high level GUI and Media
