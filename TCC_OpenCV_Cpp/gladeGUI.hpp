@@ -30,11 +30,7 @@ protected:
     Gtk::Image* image_2;    
     Gtk::Button* button_1;
     Gtk::ComboBox* combobox_image;    
-    Gtk::TextView* infoTextView;
     Gtk::Statusbar* statusbar;
-
-    // diálogo
-    Gtk::AboutDialog* about_dialog;
 };
 
 // GUI - interface Gráfica do usuário
@@ -49,9 +45,7 @@ image_1(nullptr),
 image_2(nullptr),
 button_1(nullptr),
 combobox_image(nullptr),
-infoTextView(nullptr),
-statusbar(nullptr),     
-about_dialog(nullptr)
+statusbar(nullptr)
 {
     auto app = Gtk::Application::create("GUI");
 
@@ -119,17 +113,13 @@ about_dialog(nullptr)
            &GUI::on_combobox_image_changed));
     }    
 
-    // instanciar GtkTextView
-    refBuilder->get_widget("infoTextView", infoTextView);
-
     // instanciar GtkStatusbar
     refBuilder->get_widget("statusbar", statusbar);
 
-    // instanciar GtkAboutDialog
-    refBuilder->get_widget("glade_about_dialog", about_dialog);
-
     // instanciar GtkWindow
     refBuilder->get_widget("glade_window_main", window);
+
+    // configurações iniciais  
 
     if(window) {
         app->run(*window);
@@ -143,10 +133,8 @@ about_dialog(nullptr)
     delete image_1;
     delete image_2;
     delete button_1;
-    delete combobox_image;  
-    delete infoTextView;
+    delete combobox_image;
     delete statusbar;
-    delete about_dialog;
     delete window;
 }
 

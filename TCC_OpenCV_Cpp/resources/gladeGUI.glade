@@ -2,32 +2,25 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkAboutDialog">
-    <property name="can_focus">False</property>
-    <property name="type_hint">dialog</property>
-    <property name="program_name">Glade</property>
-    <property name="logo_icon_name">image-missing</property>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="glade_about_dialog">
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">False</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
+  <object class="GtkListStore" id="list_combobox_image">
+    <columns>
+      <!-- column-name Images -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">ORIGINAL</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">GRAYSCALE</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">BINARY</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">BINARY INV</col>
+      </row>
+    </data>
   </object>
   <object class="GtkWindow" id="glade_window_main">
     <property name="can_focus">False</property>
@@ -165,23 +158,7 @@
           <object class="GtkBox" id="buttons_GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkComboBox" id="combobox_image">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
+            <property name="homogeneous">True</property>
             <child>
               <object class="GtkButton" id="button_1">
                 <property name="label" translatable="yes">Click</property>
@@ -192,7 +169,24 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkComboBox" id="combobox_image">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="model">list_combobox_image</property>
+                <property name="active">1</property>
+                <property name="active_id">combobox_image_active</property>
+                <child>
+                  <object class="GtkCellRendererText" id="cell_renderer_text"/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -200,19 +194,6 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkTextView" id="infoTextVIew">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="editable">False</property>
-            <property name="cursor_visible">False</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">3</property>
           </packing>
         </child>
         <child>
