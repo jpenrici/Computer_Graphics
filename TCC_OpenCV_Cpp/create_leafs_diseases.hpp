@@ -9,6 +9,8 @@
 
 namespace cld {
 
+	#define REPEAT 100
+
 	bool check_color(const cv::Mat& src, int y, int x)
 	{
 		// Posição alvo é o limbo foliar branco
@@ -91,7 +93,7 @@ namespace cld {
 
         for (int i = 0; i < infection; ++i)
         {
-        	int count(100);
+        	int count(REPEAT);
         	while(count--) {
 
         		// Escolher um ponto na imagem binária
@@ -102,7 +104,7 @@ namespace cld {
         		if (check_pos(image_bin, pt_leaf, spotY, spotX)) {
 
         			// Misturar imagem de mancha foliar e folha sadia
-        			std::cout << " point ... ok!" << '\n';
+        			std::cout << " : " << REPEAT - count << " ok!" << '\n';
         			infect(image_original, pt_leaf.y, pt_leaf.x, image_spot);
 
         			// Marcar na imagem binária o espaço alterado

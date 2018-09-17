@@ -4,8 +4,6 @@
 #include <gtkmm.h>
 #include <iostream>
 
-using std::cerr;
-
 class GUI {
 public:
 	GUI();
@@ -13,30 +11,47 @@ public:
 
 protected:
 	// eventos
-	void clean_on_btn_clicked();
+    void on_menu_file_open();
+    void on_menu_file_save();
+    void on_menu_file_save_as();
+    void on_menu_file_quit();
+    void on_menu_file_about();
+    void on_button_1_clicked(); 
+    void on_combobox_image_changed();  
 
+    // janela principal
 	Gtk::Window* window;
-	Gtk::Button* button_clean;
-	Gtk::ComboBox* combobox_image;
-	Gtk::Image* image_1;
-	Gtk::Image* image_2;
+    Gtk::ImageMenuItem* menu_open;
+    Gtk::ImageMenuItem* menu_save;
+    Gtk::ImageMenuItem* menu_save_as;
+    Gtk::ImageMenuItem* menu_quit;
+    Gtk::ImageMenuItem* menu_about;    
+    Gtk::Image* image_1;
+    Gtk::Image* image_2;    
+    Gtk::Button* button_1;
+    Gtk::ComboBox* combobox_image;    
     Gtk::TextView* infoTextView;
     Gtk::Statusbar* statusbar;
-    Gtk::MenuItem* menu_main;
-    Gtk::MenuItem* menu_help;
+
+    // diálogo
+    Gtk::AboutDialog* about_dialog;
 };
 
-// GUI - interface Gráfica
+// GUI - interface Gráfica do usuário
 GUI::GUI(): 
 window(nullptr),
-button_clean(nullptr),
-combobox_image(nullptr),
+menu_open(nullptr),
+menu_save(nullptr),
+menu_save_as(nullptr),
+menu_quit(nullptr),
+menu_about(nullptr),
 image_1(nullptr),
 image_2(nullptr),
+button_1(nullptr),
+combobox_image(nullptr),
 infoTextView(nullptr),
-statusbar(nullptr),
-menu_main(nullptr),
-menu_help(nullptr)
+statusbar(nullptr),     
+about_dialog(nullptr)
 {
     auto app = Gtk::Application::create("GUI");
 
@@ -45,29 +60,64 @@ menu_help(nullptr)
     try  {
       refBuilder->add_from_file("resources/gladeGUI.glade");
     } catch(const Glib::FileError& ex) {
-      cerr << "FileError: " << ex.what() << "\n";
+      std::cerr << "FileError: " << ex.what() << "\n";
       exit(0);
     } catch(const Glib::MarkupError& ex) {
-      cerr << "MarkupError: " << ex.what() << "\n";
+      std::cerr << "MarkupError: " << ex.what() << "\n";
       exit(0);
     } catch(const Gtk::BuilderError& ex) {
-      cerr << "BuilderError: " << ex.what() << "\n";
+      std::cerr << "BuilderError: " << ex.what() << "\n";
       exit(0);
     }
 
+    // instanciar GtkMenuBar
+    refBuilder->get_widget("menu_open", menu_open);
+    if (menu_open) {
+        menu_open->signal_activate().connect(sigc::mem_fun(*this,
+            &GUI::on_menu_file_open));
+    }
+
+    refBuilder->get_widget("menu_save", menu_save);
+    if (menu_save) {
+        menu_save->signal_activate().connect(sigc::mem_fun(*this,
+            &GUI::on_menu_file_save));
+    }
+
+    refBuilder->get_widget("menu_save_as", menu_save_as);
+    if (menu_save_as) {
+        menu_save_as->signal_activate().connect(sigc::mem_fun(*this,
+            &GUI::on_menu_file_save_as));
+    }
+
+    refBuilder->get_widget("menu_quit", menu_quit);
+    if (menu_quit) {
+        menu_quit->signal_activate().connect(sigc::mem_fun(*this,
+            &GUI::on_menu_file_quit));
+    }    
+
+    refBuilder->get_widget("menu_about", menu_about);
+    if (menu_about) {
+        menu_about->signal_activate().connect(sigc::mem_fun(*this,
+            &GUI::on_menu_file_about));
+    }
+
+    // instanciar GtkImage
+    refBuilder->get_widget("image_1", image_1);
+    refBuilder->get_widget("image_2", image_2);   
+    
     // instanciar GtkButton
-    refBuilder->get_widget("button_clean", button_clean);
-    if (button_clean) {
-    	button_clean->signal_clicked().connect( sigc::mem_fun(*this,
-    	&GUI::clean_on_btn_clicked));
+    refBuilder->get_widget("button_1", button_1);
+    if (button_1) {
+    	button_1->signal_clicked().connect(sigc::mem_fun(*this,
+    	   &GUI::on_button_1_clicked));
     }
 
     // instanciar GtkComboBox
     refBuilder->get_widget("combobox_image", combobox_image);
-
-    // instanciar GtkImage
-    refBuilder->get_widget("image_1", image_1);
-    refBuilder->get_widget("image_2", image_2);
+    if (combobox_image) {
+        combobox_image->signal_changed().connect(sigc::mem_fun(*this,
+           &GUI::on_combobox_image_changed));
+    }    
 
     // instanciar GtkTextView
     refBuilder->get_widget("infoTextView", infoTextView);
@@ -75,28 +125,64 @@ menu_help(nullptr)
     // instanciar GtkStatusbar
     refBuilder->get_widget("statusbar", statusbar);
 
-    // instanciar GtkMenuBar
-	refBuilder->get_widget("menu_main", menu_main);
-	refBuilder->get_widget("menu_help", menu_help);
+    // instanciar GtkAboutDialog
+    refBuilder->get_widget("glade_about_dialog", about_dialog);
 
     // instanciar GtkWindow
     refBuilder->get_widget("glade_window_main", window);
 
-    if(window) { app->run(*window); }
+    if(window) {
+        app->run(*window);
+    }
 
-    delete window;
-    delete button_clean;
+    delete menu_open;
+    delete menu_save;
+    delete menu_save_as;
+    delete menu_quit;
+    delete menu_about;
     delete image_1;
     delete image_2;
-    delete statusbar;
+    delete button_1;
+    delete combobox_image;  
     delete infoTextView;
-    delete menu_main;
-    delete menu_help;
+    delete statusbar;
+    delete about_dialog;
+    delete window;
 }
 
-void GUI::clean_on_btn_clicked() {
-	// cout << "clicked\n";
-	// ImageProcessing::test();
+void GUI::on_menu_file_open()
+{
+    std::cout << "OPEN\n";
+}
+
+void GUI::on_menu_file_save()
+{
+    std::cout << "SAVE\n";
+}
+
+void GUI::on_menu_file_save_as()
+{
+    std::cout << "SAVE AS\n";
+}
+
+void GUI::on_menu_file_quit()
+{
+    std::cout << "QUIT\n";
+}
+
+void GUI::on_menu_file_about()
+{
+    std::cout << "ABOUT\n";
+}
+
+void GUI::on_button_1_clicked()
+{
+	std::cout << "BUTTON\n";
+}
+
+void GUI::on_combobox_image_changed()
+{
+    std::cout << "COMBO BOX\n";
 }
 
 #endif // GLADE_GUI_HPP

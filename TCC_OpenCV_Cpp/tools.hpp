@@ -316,7 +316,13 @@ namespace tools {
 
 	/*
 	 *	Manipulação de arquivos
-	 */	
+	 */
+	std::string current_dir() {
+		char buffer[FILENAME_MAX];
+		getcwd(buffer, FILENAME_MAX);
+		return std::string(buffer);
+	}
+
 	template<typename T>
 	void save(const std::vector<T>& v, const std::string& path)
 	{
