@@ -6,36 +6,16 @@
  *
  * Workspace LAB1
  *
- * Objetivo testar as ferramentas de apoio (tools.hpp , img_tools.hpp)
+ * Objetivo: Testar as ferramentas de apoio (tools.hpp , img_tools.hpp)
  * para que o "arquivo.imgp" gerencie tudo que ocorre no processamento
- * da imagem.
+ * da imagem. Processar neste caso, somente uma image.
  */
 
-// #include "opencv2/photo.hpp"		// computational photography
-#include "opencv2/imgproc.hpp"		// image processing
-#include "opencv2/imgcodecs.hpp"	// image I/O
-#include "opencv2/highgui.hpp"		// high level GUI and Media
-#include "opencv2/core.hpp"			// core functionality
-
 #include "../image_tools.hpp"
-
-#include <iostream>
-#include <unordered_map>
+using namespace img_tools;
 
 using namespace std;
 using namespace cv;
-using namespace img_tools;
-
-// Busca de "paths" por vetor apesar de mais lento, atende o objetivo do teste.
-string search_path(const string& format, vector<vector<string> >& v)
-{
-	// Sem tratamento de erros, por enquanto.
-	for (auto path: v){
-		// cout << path.front() << " " << path.back() << '\n';
-		if (path.front() == format) return path.back();
-	}
-	return "EMPTY";
-}
 
 int main ()
 {
@@ -60,16 +40,13 @@ int main ()
 	string text(
 	":\n"
 	": Laboratório básico\n"
-	":\n"
-	": Uso da configuração de mapa padrão\n"
-	": ORIGINAL, COPY, GRAYSCALE, BINARY, BINARY_INV\n"
-	":\n"
-	": Workspace LAB1\n"
-	":\n"
-	": Objetivo testar ferramentas de apoio (tools.hpp , img_tools.hpp)\n");
+	": Workspace => LAB1\n");
 	tools::write(text, imgp_path);
 
-	// ler arquivo .imgp gerado para testar imagens pelo OpenCV
+	/* ler arquivo .imgp gerado
+	 * testar imagens pelo OpenCV
+	 * testar reunião de dados sobre a imagem processada
+	 */
 	cout << "Reload .imgp : " << imgp_path << '\n';
 	v_map = load_imgp(imgp_path);
 
@@ -110,7 +87,7 @@ int main ()
 	cout << "Path image: " << path_bin << '\n';
 
 	Mat src_bin(src_gray.size(), src_gray.type());
-	threshold(src_gray, src_bin, 80, 149, THRESH_BINARY);
+	threshold(src_gray, src_bin, 100, 255, THRESH_BINARY);
 
 	imshow("BINARY", src_bin);
 	imwrite(path_bin, src_bin);
@@ -121,7 +98,7 @@ int main ()
 	cout << "Path image: " << path_bin_inv << '\n';
 
 	Mat src_bin_inv(src_gray.size(), src_gray.type());
-	threshold(src_gray, src_bin_inv, 100, 150, THRESH_BINARY_INV);
+	threshold(src_gray, src_bin_inv, 120, 255, THRESH_BINARY_INV);
 
 	imshow("BINARY_INV", src_bin_inv);
 	imwrite(path_bin_inv, src_bin_inv);	

@@ -3,150 +3,67 @@
  *
  * Workspace LAB3
  *
- * Fazer binarização com limites variáveis.
+ * Objetivo: Fazer binarização com limites variáveis.
  *
  */
 
-#include "opencv2/photo.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/core.hpp"
-
 #include "../image_tools.hpp"
-
-#include <iostream>
-#include <unordered_map>
+using namespace img_tools;
 
 using namespace std;
 using namespace cv;
-using namespace img_tools;
 
-#define MIN_VALUE 70
-#define MAX_VALUE 200
-#define STEP 20
+#define FROM_THRESH 70
+#define TO_THRESH 150
+#define STEP 2
 
-string search_path(const string& format, vector<vector<string> >& v)
+void method_threshold_loop(Mat& src_binary, Mat& src_gray, const string path,
+	int threshold_type)
 {
-	for (auto path: v) {
-		if (path.front() == format) return path.back();
-	}
-	return "EMPTY";
-}
-
-void create_imgp_base(const string& workspace, const vector<string>& images,
-	const string& ext)
-{
-	for (auto image: images) {
-		if (!tools::check_filename_extension(image, ext)) continue;
-		cout << "image: " << image << '\n';
-		save_imgp(image, workspace);
+	for (int i = FROM_THRESH; i < TO_THRESH; i += STEP) {
+		string path_temp = path;
+		threshold(src_gray, src_binary, i, MAX_VALUE, threshold_type);
+		tools::add_suffix_filename(path_temp, "_" + to_string(i)	+ "-"
+									+ to_string(MAX_VALUE));
+		cout << "=> " << path_temp << "\n";
+		imwrite(path_temp, src_binary);
 	}
 }
 
-void method_threshold(Mat& src_gray, vector<vector<string> >& v_map) {
+void method_threshold(vector<vector<string> >& v_map)
+{
+	// Recuperando imagem base
+	Mat src_gray;
+	load_image(src_gray, "GRAYSCALE", v_map, IMREAD_GRAYSCALE);
 
-	for (int i = MIN_VALUE; i < MAX_VALUE; i += STEP) {
+	// OPENCV - THRESHOLD variável
+	Mat src_bin(src_gray.size(), src_gray.type());
+	Mat src_bin_inv(src_gray.size(), src_gray.type());
 
-		// OPENCV - BINARY
-		string path_bin = search_path("BINARY", v_map);
-		tools::add_suffix_filename(path_bin, "_" + to_string(i)
-			+ "-" + to_string(MAX_VALUE));		
-		cout << "OPENCV BINARY: " << path_bin << '\n';
-
-		Mat src_bin(src_gray.size(), src_gray.type());
-		threshold(src_gray, src_bin, i, MAX_VALUE, THRESH_BINARY);
-
-		imwrite(path_bin, src_bin);
-
-		// OPENCV - BINARY_INV
-		string path_bin_inv = search_path("BINARY_INV", v_map);
-		tools::add_suffix_filename(path_bin_inv, "_" + to_string(i)
-			+ "-" + to_string(MAX_VALUE));			
-		cout << "OPENCV BINARY_INV: " << path_bin_inv << '\n';
-
-		Mat src_bin_inv(src_gray.size(), src_gray.type());
-		threshold(src_gray, src_bin_inv, i, MAX_VALUE, THRESH_BINARY_INV);
-
-		imwrite(path_bin_inv, src_bin_inv);
-	}
+	cout << "THRESHOLD:\n";
+	method_threshold_loop(src_bin, src_gray,
+						  search_path("BINARY", v_map),
+						  THRESH_BINARY);
+	method_threshold_loop(src_bin_inv, src_gray,
+						  search_path("BINARY_INV", v_map),
+						  THRESH_BINARY_INV);
 }	
-
-void method_main(const vector<string>& images) {
-
-	vector<vector<string> > v_map;
-	for (auto image: images) {
-		
-		if (!tools::exist_path(image)) {
-			cout << "IMGP failure!" << '\n';
-			continue;
-		}		
-
-		cout << '\n';
-		cout << "reload .imgp : " << image << '\n';
-		v_map = load_imgp(image);
-
-		// OPENCV - ORIGINAL
-		string path_ori = search_path("ORIGINAL", v_map);
-		cout << "OPENCV ORIGINAL: " << path_ori << '\n';
-
-		Mat src_ori;
-		src_ori = imread(path_ori, IMREAD_COLOR);
-		
-		if(src_ori.empty()) {
-	        cout << "could not open or find the image!\n";
-	        error(__LINE__, "ORIGINAL failure");
-		}
-
-		// OPENCV - COPY
-		string path_cp = search_path("COPY", v_map);
-		cout << "OPENCV COPY: " << path_cp << '\n';
-
-		imwrite(path_cp, src_ori);	
-
-		// OPENCV - GRAYSCALE
-		string path_gray = search_path("GRAYSCALE", v_map);
-		cout << "OPENCV GRAYSCALE: " << path_gray << '\n';
-
-		Mat src_gray(src_ori.size(), CV_8U);
-		cvtColor(src_ori, src_gray, CV_BGR2GRAY);
-		imwrite(path_gray, src_gray);
-
-		// Método Threshold
-		method_threshold(src_gray, v_map);
-
-	}
-}	
-
-void image_processing_basic(const string& new_workspace, const string& folder, 
-	const string& ext)
-{
-	// passo 1 - checar se diretório de imagens existe
-	if (!tools::exist_path(folder)) {
-		cout << "folder failure\n";
-		exit(0);
-	}	
-
-	// passo 2 - criar workspace
-	method_name = tools::lower(new_workspace) + "_";
-	create_workspace(new_workspace);
-
-	// passo 3 - listar arquivos de imagens alvo
-	vector<string> images;
-	tools::files(images, folder);
-
-	// passo 4 - gerar os arquivos de gerencia
-	create_imgp_base(new_workspace, images, ext);
-	cout << '\n';
-
-	// passo 5 - processar para cada .imgp as imagens
-	tools::files(images, new_workspace + "/imgp");
-	method_main(images);	
-}
 
 int main()
 {
-	image_processing_basic("LAB3", "../Images/images_test/Anthurium", "jpg");
+	string new_workspace(tools::current_dir() + "/LAB3");
+	string new_method_name = "lab3_";
+	string new_folder = "../Images/images_test/leaf_disease";
+	string new_extension = "jpg";	
+
+	bath(new_workspace, new_method_name, new_folder, new_extension);
+
+	vector<string> imgps = list_imgp(new_workspace);
+	vector<vector<string> > v_map;
+	for (auto imgp: imgps) {
+		v_map = load_imgp(imgp);
+		method_threshold(v_map);
+	}
 
 	return 0;
 }

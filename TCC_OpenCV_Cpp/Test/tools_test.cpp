@@ -205,7 +205,10 @@ int main()
 	string p = "directory/directory/filename.png";
 	cout << p << '\n';
 	add_suffix_filename(p, "_new");
-	cout << p << '\n';	
+	cout << p << '\n';
+
+	// checar diretório atual
+	cout << current_dir() << '\n';
 
 	return 0;
 }
