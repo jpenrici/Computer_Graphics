@@ -10,42 +10,42 @@ public:
 	virtual ~ImageView();
 
 protected:
-	const std::string& path_image_default = "./resources/empty.png";
+	const std::string path_image_default = "./resources/empty.png";
 
-    void on_menu_file_open();
-    void on_menu_file_save();
-    void on_menu_file_save_as();
-    void on_menu_file_quit();
+	void on_menu_file_open();
+	void on_menu_file_save();
+	void on_menu_file_save_as();
+	void on_menu_file_quit();
 	void on_menu_choices_one();
 	void on_menu_choices_two();
-    void on_menu_help_about();	
-    void on_button_1_clicked();
-    void on_combobox_image_changed();	
+	void on_menu_help_about();	
+	void on_button_1_clicked();
+	void on_combobox_image_changed();	
 
-    Gtk::Box VBox, HBox_1, HBox_2;
-    Gtk::Image image_1, image_2;    
-    Gtk::Button button_1;
-    Gtk::ComboBox combobox_image;   
-    Gtk::Statusbar statusbar;
+	Gtk::Box VBox, HBox_1, HBox_2;
+	Gtk::Image image_1, image_2;    
+	Gtk::Button button_1;
+	Gtk::ComboBox combobox_image;   
+	Gtk::Statusbar statusbar;
 
-    Glib::RefPtr<Gtk::UIManager> menu_refUIManager;
+	Glib::RefPtr<Gtk::UIManager> menu_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> menu_refActionGroup;
 	Glib::RefPtr<Gtk::RadioAction> menu_refOptionOne, menu_refOptionTwo;
 
-    class ModelColumns : public Gtk::TreeModel::ColumnRecord {
-    public:
-        ModelColumns() { add(action); }
-        Gtk::TreeModelColumn<Glib::ustring> action;
-    };
+	class ModelColumns : public Gtk::TreeModel::ColumnRecord {
+	public:
+		ModelColumns() { add(action); }
+		Gtk::TreeModelColumn<Glib::ustring> action;
+	};
 
-    bool flag_combobox_image;
-    ModelColumns combobox_image_columns;
-    Glib::RefPtr<Gtk::ListStore> combobox_image_list;
+	bool flag_combobox_image;
+	ModelColumns combobox_image_columns;
+	Glib::RefPtr<Gtk::ListStore> combobox_image_list;
 };
 
 ImageView::ImageView():
-	button_1("Run", true),
-	flag_combobox_image(false)
+button_1("Run", true),
+flag_combobox_image(false)
 {
 	// configuração inicial da janela
 	set_title("Image View");
@@ -64,16 +64,16 @@ ImageView::ImageView():
 	menu_refActionGroup->add(Gtk::Action::create("FileMenu", "File"));
 	menu_refActionGroup->add(Gtk::Action::create("FileOpen",
 		Gtk::Stock::OPEN),
-		sigc::mem_fun(*this, &ImageView::on_menu_file_open));
+	sigc::mem_fun(*this, &ImageView::on_menu_file_open));
 	menu_refActionGroup->add(Gtk::Action::create("FileSave",
 		Gtk::Stock::SAVE),
-		sigc::mem_fun(*this, &ImageView::on_menu_file_save));
+	sigc::mem_fun(*this, &ImageView::on_menu_file_save));
 	menu_refActionGroup->add(Gtk::Action::create("FileSaveAs",
 		Gtk::Stock::SAVE_AS),
-		sigc::mem_fun(*this, &ImageView::on_menu_file_save_as));
+	sigc::mem_fun(*this, &ImageView::on_menu_file_save_as));
 	menu_refActionGroup->add(Gtk::Action::create("FileQuit",
 		Gtk::Stock::QUIT),
-		sigc::mem_fun(*this, &ImageView::on_menu_file_quit));
+	sigc::mem_fun(*this, &ImageView::on_menu_file_quit));
 
 	// choices menu, radio items
 	menu_refActionGroup->add(Gtk::Action::create("OptionsMenu", "Options"));
@@ -81,17 +81,17 @@ ImageView::ImageView():
 	menu_refOptionOne = Gtk::RadioAction::create(group_userlevel,
 		"OptionOne", "One");
 	menu_refActionGroup->add(menu_refOptionOne,
-			sigc::mem_fun(*this, &ImageView::on_menu_choices_one));
+		sigc::mem_fun(*this, &ImageView::on_menu_choices_one));
 	menu_refOptionTwo = Gtk::RadioAction::create(group_userlevel,
 		"OptionTwo", "Two");
 	menu_refActionGroup->add(menu_refOptionTwo,
-			sigc::mem_fun(*this, &ImageView::on_menu_choices_two));
+		sigc::mem_fun(*this, &ImageView::on_menu_choices_two));
 
 	// help menu:
 	menu_refActionGroup->add(Gtk::Action::create("HelpMenu", "Help"));
 	menu_refActionGroup->add(Gtk::Action::create("HelpAbout",
 		Gtk::Stock::ABOUT),
-		sigc::mem_fun(*this, &ImageView::on_menu_help_about));
+	sigc::mem_fun(*this, &ImageView::on_menu_help_about));
 
 	menu_refUIManager = Gtk::UIManager::create();
 	menu_refUIManager->insert_action_group(menu_refActionGroup);
@@ -99,25 +99,25 @@ ImageView::ImageView():
 
 	// layout do menubar
 	Glib::ustring ui_info =
-			"<ui>"
-			"  <menubar name='MenuBar'>"
-			"    <menu action='FileMenu'>"
-			"      <menuitem action='FileOpen' />"
-			"      <separator/>"			
-			"      <menuitem action='FileSave' />"
-			"      <menuitem action='FileSaveAs' />"
-			"      <separator/>"
-			"      <menuitem action='FileQuit'/>"
-			"    </menu>"
-			"    <menu action='OptionsMenu'>"
-			"      <menuitem action='OptionOne'/>"
-			"      <menuitem action='OptionTwo'/>"
-			"    </menu>"
-			"    <menu action='HelpMenu'>"
-			"      <menuitem action='HelpAbout'/>"
-			"    </menu>"
-			"  </menubar>"
-			"</ui>";
+	"<ui>"
+	"  <menubar name='MenuBar'>"
+	"    <menu action='FileMenu'>"
+	"      <menuitem action='FileOpen' />"
+	"      <separator/>"			
+	"      <menuitem action='FileSave' />"
+	"      <menuitem action='FileSaveAs' />"
+	"      <separator/>"
+	"      <menuitem action='FileQuit'/>"
+	"    </menu>"
+	"    <menu action='OptionsMenu'>"
+	"      <menuitem action='OptionOne'/>"
+	"      <menuitem action='OptionTwo'/>"
+	"    </menu>"
+	"    <menu action='HelpMenu'>"
+	"      <menuitem action='HelpAbout'/>"
+	"    </menu>"
+	"  </menubar>"
+	"</ui>";
 
 	try
 	{
@@ -189,10 +189,10 @@ void ImageView::on_menu_file_open()
 
 	std::cout << dialog.get_filename() << std::endl;
 
-    std::vector<std::string> types_image { "A", "B" };
-    std::cout << "OPEN\n";
+	std::vector<std::string> types_image { "A", "B" };
+	std::cout << "OPEN\n";
 
-    if (!flag_combobox_image) {
+	if (!flag_combobox_image) {
         flag_combobox_image = true;	// carregar lista somente para uma imagem
 
         // criando lista para o comboBox
@@ -201,24 +201,24 @@ void ImageView::on_menu_file_open()
 
         Gtk::TreeModel::Row row;
         for (unsigned i = 0; i < types_image.size(); ++i) {
-            row = *(combobox_image_list->append());
-            row[combobox_image_columns.action] = types_image[i];        
+        	row = *(combobox_image_list->append());
+        	row[combobox_image_columns.action] = types_image[i];        
         }
         combobox_image.pack_start(combobox_image_columns.action);
 
     } else {
-        std::cout << "lista aberta!\n";
+    	std::cout << "lista aberta!\n";
     }  
 }
 
 void ImageView::on_menu_file_save()
 {
-    std::cout << "SAVE\n";
+	std::cout << "SAVE\n";
 }
 
 void ImageView::on_menu_file_save_as()
 {
-    std::cout << "SAVE AS\n";
+	std::cout << "SAVE AS\n";
 }
 
 void ImageView::on_menu_file_quit(){
@@ -247,10 +247,10 @@ void ImageView::on_menu_choices_two(){
 
 void ImageView::on_menu_help_about()
 {
-    std::cout << "ABOUT\n";
-    Gtk::MessageDialog dialog(*this, "This is an INFO MessageDialog");
-    dialog.set_transient_for(*this);
-    dialog.run();
+	std::cout << "ABOUT\n";
+	Gtk::MessageDialog dialog(*this, "This is an INFO MessageDialog");
+	dialog.set_transient_for(*this);
+	dialog.run();
 }
 
 void ImageView::on_button_1_clicked()
@@ -260,7 +260,7 @@ void ImageView::on_button_1_clicked()
 
 void ImageView::on_combobox_image_changed()
 {
-    std::cout << "COMBO BOX\n";
+	std::cout << "COMBO BOX\n";
 }
 
 
