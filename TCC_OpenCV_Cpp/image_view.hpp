@@ -10,7 +10,7 @@
 class Image_view : public Gtk::Window {
 
 #define IMGROWS 2
-#define IMGCOLS 3
+#define IMGCOLS 2
 
 public:
 	Image_view();
@@ -179,7 +179,8 @@ image_created(0)
 
 		for (unsigned j = 0; j < IMGCOLS; ++j) {
 
-			pos = (IMGROWS * i) + i + j;
+			report_terminal("image box " + std::to_string(pos)
+				+ " initialized ...");
 
 			VBox_image[pos].set_orientation(Gtk::ORIENTATION_VERTICAL);
 			VBox_image[pos].set_spacing(3);
@@ -205,7 +206,8 @@ image_created(0)
 				VBox_image[pos].show();
 				image_in_use[pos] = false;
 			}
-			HBox[i].pack_start(VBox_image[pos], true, true);				
+			HBox[i].pack_start(VBox_image[pos], true, true);
+			pos++;			
 		}
 
 		HBox[i].show();
@@ -283,10 +285,13 @@ void Image_view::update_box_image(const int& current_image)
 			(combobox_image_list[current_image]);
 
 		v_map = load_imgp(path);
+		if (v_map.empty()) {
+			report ("File with problems.\nCould not open.");
+			return;
+		}
+
 		for (size_t i = 0; i < v_map.size(); ++i)
 		{
-			if (v_map[i].size() < 2) continue;
-
 			report_terminal(v_map[i][0]	+ " => " + v_map[i][1]);
 			row = *(combobox_image_list[current_image]->append());
 			row[combobox_image_columns[current_image].action] = v_map[i][0];        
@@ -390,7 +395,7 @@ void Image_view::on_menu_choices_two()
 
 void Image_view::on_menu_help_about()
 {
-	report("ABOUT");
+	report("Simple Image Viewer.");
 }
 
 void Image_view::on_button_clicked(const int& num_button)
@@ -415,11 +420,22 @@ Image_view::load_imgp (const std::string& file_imgp)
 		result.clear();
 		for (std::string line : lines) {
 			tools::split(line, word, ':');
+			
+			if (word.size() != 2) {
+				report_terminal("ignored line ...");
+				continue;
+			}
+
+			if (word[0][0] == '#') {
+				report_terminal("ignored line ...");
+				continue;				
+			}
+
 			result.push_back(word);
 		}
 	}
 	catch(const std::exception& e) {
-		tools::error(__LINE__, "img_tools::load_imgp");
+		tools::error(__LINE__, "Image_view::load_imgp");
 	}
 	return result;
 }
