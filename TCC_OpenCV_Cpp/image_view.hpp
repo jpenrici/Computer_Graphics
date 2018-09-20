@@ -1,3 +1,7 @@
+/*
+ * Interface gráfica para visualização das imagens gerenciados pelo .imgp
+ *
+ */
 #ifndef IMAGE_VIEW_HPP
 #define IMAGE_VIEW_HPP
 
@@ -6,10 +10,11 @@
 #include <gtkmm.h>
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 class Image_view : public Gtk::Window {
 
-#define IMGROWS 2
+#define IMGROWS 1
 #define IMGCOLS 2
 
 public:
@@ -17,9 +22,15 @@ public:
 	virtual ~Image_view();
 
 protected:
-	int image_created;
 	const std::string image_default = "../resources/empty.png";
+
+	int image_created;	
 	std::vector<std::vector<std::string> > v_map;
+
+	std::string str_min(const std::string& /*path*/);
+
+	std::vector<std::vector<std::string> >
+	load_imgp(const std::string& /*path imgp*/);	
 
 	// eventos
 	void on_menu_file_new();
@@ -36,17 +47,14 @@ protected:
 	void report_terminal(const std::string& /*message*/);
 	void update_box_image(const int& /*num image*/);
 
-	std::vector<std::vector<std::string> >
-	load_imgp(const std::string& /*path imgp*/);
-
 	// widgets
 	Gtk::Box 		VBox;
 	Gtk::Box 		HBox[IMGROWS];
 	Gtk::Box 		VBox_image[IMGROWS * IMGCOLS];
 	Gtk::Image 		image[IMGROWS * IMGCOLS];    
 	Gtk::Button 	button[IMGROWS * IMGCOLS];
-	Gtk::ComboBox 	combobox_image[IMGROWS * IMGCOLS];  
-	Gtk::Statusbar 	statusbar;
+	Gtk::ComboBox 	combobox_image[IMGROWS * IMGCOLS];
+	Gtk::Label 		label_info[IMGROWS * IMGCOLS];
 
 	Glib::RefPtr<Gtk::UIManager> 	menu_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> 	menu_refActionGroup;
@@ -65,14 +73,14 @@ protected:
 
 	bool image_in_use[IMGROWS * IMGCOLS];
 	ModelColumns combobox_image_columns[IMGROWS * IMGCOLS];
-	Glib::RefPtr<Gtk::ListStore> combobox_image_list[IMGROWS * IMGCOLS];
+	Glib::RefPtr<Gtk::ListStore> combobox_image_list[IMGROWS * IMGCOLS];	
 };
 
 Image_view::Image_view():
 image_created(0)
 {
 	// configuração inicial
-	set_title("Image View [Testing]");
+	set_title("Image View [ Testing ]");
 	set_border_width(5);
 
 	// box principal
@@ -198,11 +206,13 @@ image_created(0)
 			VBox_image[pos].pack_start(image[pos], true, true);
 			VBox_image[pos].pack_start(button[pos], true, true);
 			VBox_image[pos].pack_start(combobox_image[pos], true, true);
+			VBox_image[pos].pack_start(label_info[pos], true, true);
 
 			if (pos == image_created){
 				image[pos].show();
 				// button[pos].show();
 				// combobox_image[pos].show();
+				// label_info[pos].show();
 				VBox_image[pos].show();
 				image_in_use[pos] = false;
 			}
@@ -213,9 +223,6 @@ image_created(0)
 		HBox[i].show();
 		VBox.pack_start(HBox[i], true, true);
 	}
-
-	statusbar.show();
-	VBox.pack_start(statusbar, true, true);
 
 	VBox.show();
 }
@@ -266,7 +273,7 @@ void Image_view::update_box_image(const int& current_image)
 	// validar arquivo
 	std::string path = dialog.get_filename();
 	bool is_imgp = tools::check_filename_extension(path, "imgp");
-	bool is_image = tools::check_filename_extension(path, "png");
+	bool is_image = tools::check_filename_extension(path, tools::image_extension);
 
 	if (!is_imgp && !is_image) {
 			report("Invalid: " + path);
@@ -284,29 +291,35 @@ void Image_view::update_box_image(const int& current_image)
 		combobox_image[current_image].set_model
 			(combobox_image_list[current_image]);
 
-		v_map = load_imgp(path);
+		v_map = load_imgp(path);					
 		if (v_map.empty()) {
 			report ("File with problems.\nCould not open.");
 			return;
 		}
 
-		for (size_t i = 0; i < v_map.size(); ++i)
-		{
+		for (size_t i = 0; i < v_map.size(); ++i) {
 			report_terminal(v_map[i][0]	+ " => " + v_map[i][1]);
 			row = *(combobox_image_list[current_image]->append());
 			row[combobox_image_columns[current_image].action] = v_map[i][0];        
 			row[combobox_image_columns[current_image].source] = v_map[i][1];        
+
+			if (i == 0) {
+				combobox_image[current_image].set_active(row); 
+				image[current_image].set(v_map[i][1]);   
+			}
 		}
 
 		combobox_image[current_image].pack_start
 			(combobox_image_columns[current_image].action);
-		combobox_image[current_image].pack_start
-			(combobox_image_columns[current_image].source);			
+		// combobox_image[current_image].pack_start
+		// 	(combobox_image_columns[current_image].source);			
 
-		image[current_image].set("../resources/tree-17.png");	// TEMP
 		button[current_image].show();
 		combobox_image[current_image].show();
-		statusbar.push(path, current_image);
+		label_info[current_image].show();
+
+		label_info[current_image].set_text("last read IMGP file ["
+			+ std::to_string(current_image + 1) + "]: " + str_min(path));
 		report_terminal("IMGP OPEN");
 	}
 
@@ -314,7 +327,10 @@ void Image_view::update_box_image(const int& current_image)
 		image[current_image].set(path);
 		button[current_image].show();
 		combobox_image[current_image].hide();
-		statusbar.push(path, current_image);
+		label_info[current_image].show();
+
+		label_info[current_image].set_text("last read IMAGE file ["
+			+ std::to_string(current_image + 1)	+ "]: " + str_min(path));
 		report_terminal("IMAGE OPEN");
 	} 	
 
@@ -407,7 +423,35 @@ void Image_view::on_button_clicked(const int& num_button)
 
 void Image_view::on_combobox_image_changed(const int& option)
 {
-	report_terminal("COMBO BOX" + std::to_string(option));
+	Gtk::TreeModel::iterator iter = combobox_image[option].get_active();
+	if (iter) {
+		Gtk::TreeModel::Row row = *iter;
+		if (row) {
+			Glib::ustring action = row[combobox_image_columns[option].action];
+			Glib::ustring source = row[combobox_image_columns[option].source];
+
+			std::cout << action << std::endl;
+			std::cout << source << std::endl;
+
+			image[option].set(source);
+		}
+	} else {
+		std::cout << "invalid iter ..." << std::endl;
+	}
+
+	report_terminal("COMBO BOX " + std::to_string(option));
+}
+
+std::string Image_view::str_min(const std::string& path)
+{
+	int count(0);
+	std::string out("");
+	for (size_t i = path.size() - 1; i >= 0; --i) {
+		if (path[i] == '/') count++;
+		if (count == 4) break;
+		out = path[i] + out;
+	}
+	return out;
 }
 
 std::vector<std::vector<std::string> >
