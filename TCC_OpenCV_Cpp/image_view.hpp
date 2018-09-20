@@ -5,10 +5,12 @@
 
 #include <gtkmm.h>
 #include <iostream>
+#include <vector>
 
 class Image_view : public Gtk::Window {
 
-#define IMAGES 3
+#define IMGROWS 2
+#define IMGCOLS 3
 
 public:
 	Image_view();
@@ -17,6 +19,7 @@ public:
 protected:
 	int image_created;
 	const std::string image_default = "../resources/empty.png";
+	std::vector<std::vector<std::string> > v_map;
 
 	// eventos
 	void on_menu_file_new();
@@ -26,20 +29,24 @@ protected:
 	void on_menu_file_quit();
 	void on_menu_choices_one();
 	void on_menu_choices_two();
-	void on_menu_help_about();	
-	void on_button_clicked(const int& /*num button*/);
-	void on_combobox_image_changed();
+	void on_menu_help_about();
+	void on_button_clicked(const int& /*num image*/);
+	void on_combobox_image_changed(const int& /*num image*/);
 	void report(const std::string& /*message*/);
 	void report_terminal(const std::string& /*message*/);
+	void update_box_image(const int& /*num image*/);
+
+	std::vector<std::vector<std::string> >
+	load_imgp(const std::string& /*path imgp*/);
 
 	// widgets
-	Gtk::Box VBox;
-	Gtk::Box HBox;
-	Gtk::Box VBox_image[IMAGES];
-	Gtk::Image image[IMAGES];    
-	Gtk::Button button[IMAGES];
-	Gtk::ComboBox combobox_image[IMAGES];  
-	Gtk::Statusbar statusbar;
+	Gtk::Box 		VBox;
+	Gtk::Box 		HBox[IMGROWS];
+	Gtk::Box 		VBox_image[IMGROWS * IMGCOLS];
+	Gtk::Image 		image[IMGROWS * IMGCOLS];    
+	Gtk::Button 	button[IMGROWS * IMGCOLS];
+	Gtk::ComboBox 	combobox_image[IMGROWS * IMGCOLS];  
+	Gtk::Statusbar 	statusbar;
 
 	Glib::RefPtr<Gtk::UIManager> 	menu_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> 	menu_refActionGroup;
@@ -47,13 +54,18 @@ protected:
 
 	class ModelColumns : public Gtk::TreeModel::ColumnRecord {
 	public:
-		ModelColumns() { add(action); }
+		ModelColumns()
+		{
+			add(action);
+			add(source);
+		}
 		Gtk::TreeModelColumn<Glib::ustring> action;
+		Gtk::TreeModelColumn<Glib::ustring> source;
 	};
 
-	bool image_in_use[IMAGES];
-	ModelColumns combobox_image_columns[IMAGES];
-	Glib::RefPtr<Gtk::ListStore> combobox_image_list[IMAGES];
+	bool image_in_use[IMGROWS * IMGCOLS];
+	ModelColumns combobox_image_columns[IMGROWS * IMGCOLS];
+	Glib::RefPtr<Gtk::ListStore> combobox_image_list[IMGROWS * IMGCOLS];
 };
 
 Image_view::Image_view():
@@ -159,37 +171,46 @@ image_created(0)
 	if (pMenubar) VBox.pack_start(*pMenubar, Gtk::PACK_SHRINK);
 
 	// outros widgets
-	HBox.set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-	HBox.set_spacing(6);
-
-	for (unsigned i = 0; i < IMAGES; ++i)
+	unsigned pos = 0;
+	for (unsigned i = 0; i < IMGROWS; ++i)
 	{
-		VBox_image[i].set_orientation(Gtk::ORIENTATION_VERTICAL);
-		VBox_image[i].set_spacing(3);
-		
-		image[i].set(image_default);
+		HBox[i].set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+		HBox[i].set_spacing(6);
 
-		button[i].set_label("Reload file " + std::to_string(i+1));
-		button[i].signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,
-			&Image_view::on_button_clicked), i));
+		for (unsigned j = 0; j < IMGCOLS; ++j) {
 
-		// combobox_image[i].signal....
+			pos = (IMGROWS * i) + i + j;
 
-		VBox_image[i].pack_start(image[i], true, true);
-		VBox_image[i].pack_start(button[i], true, true);
-		VBox_image[i].pack_start(combobox_image[i], true, true);
+			VBox_image[pos].set_orientation(Gtk::ORIENTATION_VERTICAL);
+			VBox_image[pos].set_spacing(3);
+			
+			image[pos].set(image_default);
 
-		if (i == image_created){
-			image[i].show();
-			VBox_image[i].show();
-			image_in_use[i] = false;
+			button[pos].set_label("Reload file " + std::to_string(pos + 1));
+			button[pos].signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,
+				&Image_view::on_button_clicked), pos));
+
+			combobox_image[pos].signal_changed().connect
+				(sigc::bind(sigc::mem_fun
+				(*this, &Image_view::on_combobox_image_changed), pos));
+
+			VBox_image[pos].pack_start(image[pos], true, true);
+			VBox_image[pos].pack_start(button[pos], true, true);
+			VBox_image[pos].pack_start(combobox_image[pos], true, true);
+
+			if (pos == image_created){
+				image[pos].show();
+				// button[pos].show();
+				// combobox_image[pos].show();
+				VBox_image[pos].show();
+				image_in_use[pos] = false;
+			}
+			HBox[i].pack_start(VBox_image[pos], true, true);				
 		}
 
-		HBox.pack_start(VBox_image[i], true, true);
-		HBox.show();
+		HBox[i].show();
+		VBox.pack_start(HBox[i], true, true);
 	}
-
-	VBox.pack_start(HBox, true, true);
 
 	statusbar.show();
 	VBox.pack_start(statusbar, true, true);
@@ -199,59 +220,22 @@ image_created(0)
 
 Image_view::~Image_view() {	/* destructor */ }
 
-void Image_view::report(const std::string& message)
-{
-	Gtk::MessageDialog dialog (*this, message);
-	dialog.set_transient_for(*this);
-	dialog.run();
-}
-
 void Image_view::report_terminal(const std::string& src)
 {
 	Glib::ustring message(src);
 	std::cout << message << std::endl;
 }
 
-void Image_view::on_menu_file_new()
+void Image_view::report(const std::string& message)
 {
-	// checar se existe imagem para o box atual
-	if (!image_in_use[image_created]) {
-		report_terminal("image " + std::to_string(image_created)
-			+ " is free. Open new viewer!\n");
-		on_menu_file_open();		
-		return;
-	}
-
-	// verificar se todos os espaços foram preenchidos
-	image_created++;
-	if (image_created >= IMAGES) {
-		report("limit exceeded!");
-		report_terminal("limit exceeded!");
-		return;
-	}
-
-	// exibir novo espaço
-	image[image_created].show();
-	VBox_image[image_created].show();
-	image_in_use[image_created] = false;
-	report_terminal("new box displayed!");
-
-	on_menu_file_open();
+	report_terminal(message);
+	Gtk::MessageDialog dialog (*this, message);
+	dialog.set_transient_for(*this);
+	dialog.run();
 }
 
-void Image_view::on_menu_file_open()
+void Image_view::update_box_image(const int& current_image)
 {
-	if (image_created >= IMAGES) {
-		report("limit exceeded!");
-		report_terminal("limit exceeded!");
-		return;
-	}
-
-	if (image_in_use[image_created]) {
-		report("Local ocupado ....\nSubstituir??");
-		return;
-	}
-
 	// selecionar novo arquivo
 	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for(*this);
@@ -284,43 +268,92 @@ void Image_view::on_menu_file_open()
 
 	if (!is_imgp && !is_image) {
 			report("Invalid: " + path);
-			report_terminal("Invalid: " + path);
 			return;
 	}
 
-	image_in_use[image_created] = true;
+	image_in_use[current_image] = true;
 
 	if (is_imgp) {
 
-		std::vector<std::string> types_image { "A", "B" };
+		// criando lista para o comboBox
+		Gtk::TreeModel::Row row;
+		combobox_image_list[current_image] = Gtk::ListStore::create
+			(combobox_image_columns[current_image]);
+		combobox_image[current_image].set_model
+			(combobox_image_list[current_image]);
 
-        // criando lista para o comboBox
-        combobox_image_list[image_created] = Gtk::ListStore::create
-        	(combobox_image_columns[image_created]);
-        combobox_image[image_created].set_model(combobox_image_list[image_created]);
+		v_map = load_imgp(path);
+		for (size_t i = 0; i < v_map.size(); ++i)
+		{
+			if (v_map[i].size() < 2) continue;
 
-        Gtk::TreeModel::Row row;
-        for (unsigned i = 0; i < types_image.size(); ++i) {
-        	row = *(combobox_image_list[image_created]->append());
-        	row[combobox_image_columns[image_created].action] = types_image[i];        
-        }
-        combobox_image[image_created].pack_start
-        	(combobox_image_columns[image_created].action);
+			report_terminal(v_map[i][0]	+ " => " + v_map[i][1]);
+			row = *(combobox_image_list[current_image]->append());
+			row[combobox_image_columns[current_image].action] = v_map[i][0];        
+			row[combobox_image_columns[current_image].source] = v_map[i][1];        
+		}
 
-		image[image_created].set("../resources/tree-17.png"); // gerar outro caminho
-        button[image_created].show();
-		combobox_image[image_created].show();
-		statusbar.push(path, image_created);
+		combobox_image[current_image].pack_start
+			(combobox_image_columns[current_image].action);
+		combobox_image[current_image].pack_start
+			(combobox_image_columns[current_image].source);			
+
+		image[current_image].set("../resources/tree-17.png");	// TEMP
+		button[current_image].show();
+		combobox_image[current_image].show();
+		statusbar.push(path, current_image);
 		report_terminal("IMGP OPEN");
 	}
 
 	if (is_image) {
-		image[image_created].set(path);
-		button[image_created].show();
-		combobox_image[image_created].hide();
-		statusbar.push(path, image_created);
+		image[current_image].set(path);
+		button[current_image].show();
+		combobox_image[current_image].hide();
+		statusbar.push(path, current_image);
 		report_terminal("IMAGE OPEN");
-    } 
+	} 	
+
+}
+
+void Image_view::on_menu_file_new()
+{
+	// checar se existe imagem para o box atual
+	if (!image_in_use[image_created]) {
+		report_terminal("image " + std::to_string(image_created)
+			+ " is free. Open new viewer!\n");
+		on_menu_file_open();		
+		return;
+	}
+
+	// verificar se todos os espaços foram preenchidos
+	image_created++;
+	if (image_created >= IMGROWS * IMGCOLS) {
+		report("limit exceeded!");
+		return;
+	}
+
+	// exibir novo espaço
+	image[image_created].show();
+	VBox_image[image_created].show();
+	image_in_use[image_created] = false;
+	report_terminal("new box displayed!");
+
+	on_menu_file_open();
+}
+
+void Image_view::on_menu_file_open()
+{
+	if (image_created >= IMGROWS * IMGCOLS) {
+		report("limit exceeded!");
+		return;
+	}
+
+	if (image_in_use[image_created]) {
+		report("Click to reload image!");
+		return;
+	}
+
+	update_box_image(image_created);
 }
 
 void Image_view::on_menu_file_save()
@@ -358,17 +391,37 @@ void Image_view::on_menu_choices_two()
 void Image_view::on_menu_help_about()
 {
 	report("ABOUT");
-	report_terminal("ABOUT");
 }
 
 void Image_view::on_button_clicked(const int& num_button)
 {
+	image_in_use[num_button] = false;
 	report_terminal("BUTTON " + std::to_string(num_button));
+	update_box_image(num_button);
 }
 
-void Image_view::on_combobox_image_changed()
+void Image_view::on_combobox_image_changed(const int& option)
 {
-	report_terminal("COMBO BOX");
+	report_terminal("COMBO BOX" + std::to_string(option));
+}
+
+std::vector<std::vector<std::string> >
+Image_view::load_imgp (const std::string& file_imgp)
+{
+	std::vector<std::string> lines, word;
+	std::vector<std::vector<std::string> > result {{"EMPTY"}};
+	try {
+		tools::load(file_imgp, lines);
+		result.clear();
+		for (std::string line : lines) {
+			tools::split(line, word, ':');
+			result.push_back(word);
+		}
+	}
+	catch(const std::exception& e) {
+		tools::error(__LINE__, "img_tools::load_imgp");
+	}
+	return result;
 }
 
 #endif // IMAGE_VIEW_HPP
