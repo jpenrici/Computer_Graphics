@@ -28,6 +28,7 @@ namespace img_tools {
 	static const std::string WORKSPACE_OUT = "/output";
 	static const std::string METHOD = "M0_";
 
+	// utilizar '#' como no shell para desabilitar item ao carregar '.imgp' 
 	static const std::unordered_map<std::string, std::string> map_default = {
 		{"ORIGINAL"  , "."},
 		{"COPY"      , "/original"},
@@ -158,7 +159,7 @@ namespace img_tools {
 						+ method_name + name + ".imgp";
 			std::cout << "save .imgp: " << imgp_path;
 			tools::save_new_file(imgp_path);
-			tools::write("IMGP:" + imgp_path + "\n", imgp_path);
+			tools::write("#IMGP:" + imgp_path + "\n", imgp_path);
 
 			for (auto it: map_work) {
 				if (it.first == "ORIGINAL") {
@@ -172,7 +173,7 @@ namespace img_tools {
 				}
 				tools::write(path_temp, imgp_path);
 			}
-			tools::write("WORKSPACE:" + new_workspace + "\n", imgp_path);
+			tools::write("#WORKSPACE:" + new_workspace + "\n", imgp_path);
 
 			std::cout << " ... ok" << '\n';
 		}
@@ -204,6 +205,18 @@ namespace img_tools {
 			result.clear();
 			for (std::string line : lines) {
 				tools::split(line, word, ':');
+				
+				if (word.size() != 2) {
+					std::cout << "ignored line ...\n";
+					continue;
+				}
+
+				// ignorar textos extras
+				if (word[0][0] == '#') {
+					std::cout << "ignored line ...\n";
+					continue;				
+				}
+
 				result.push_back(word);
 			}
 		}

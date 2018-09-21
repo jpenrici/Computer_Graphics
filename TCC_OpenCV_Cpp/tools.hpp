@@ -20,6 +20,11 @@
 
 namespace tools {
 
+	static const std::unordered_map<std::string, std::string> image_extension = {
+		{"PNG", "png"}, {"JPG", "jpg"}, {"JPEG", "jpeg"},
+		{"png", "png"}, {"jpg", "jpg"}, {"jpeg", "jpeg"}
+	};	
+
 	/*
 	* Mensagem de erro
 	*/
