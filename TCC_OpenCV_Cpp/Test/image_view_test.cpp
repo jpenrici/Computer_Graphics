@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-	auto app = Gtk::Application::create(argc, argv, "Image View");
+	auto app = Gtk::Application::create(argc, argv, "imageView.example");
 
 	Image_view window;
 

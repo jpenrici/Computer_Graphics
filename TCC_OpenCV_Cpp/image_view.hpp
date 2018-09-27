@@ -14,8 +14,9 @@
 
 class Image_view : public Gtk::Window {
 
-#define IMGROWS 1
+#define IMGROWS 2
 #define IMGCOLS 2
+#define SHORT_PATH 1	
 
 public:
 	Image_view();
@@ -26,6 +27,7 @@ protected:
 
 	int image_created;
 	bool image_lock[IMGROWS * IMGCOLS];
+	bool swap_released[IMGROWS * IMGCOLS];
 	std::vector<std::vector<std::string> > v_map;
 
 	// métodos comuns
@@ -43,6 +45,7 @@ protected:
 	void on_menu_option_two();
 	void on_menu_help_about();
 	void on_button_clicked(const int& /*num image*/);
+	void on_hide_button_image();
 	void on_combobox_changed(const int& /*num image*/);
 	void update_image(const int& /*num image*/);	
 	void report(const std::string& /*message*/);
@@ -60,6 +63,7 @@ protected:
 	Glib::RefPtr<Gtk::UIManager> 	menu_refUIManager;
 	Glib::RefPtr<Gtk::ActionGroup> 	menu_refActionGroup;
 	Glib::RefPtr<Gtk::RadioAction> 	menu_refOptionOne, menu_refOptionTwo;
+	Glib::RefPtr<Gtk::ToggleAction>  menu_refCheckOne;
 
 	class ModelColumns : public Gtk::TreeModel::ColumnRecord {
 	public:
@@ -81,7 +85,7 @@ image_created(-1),
 image_default("../resources/empty.png")
 {
 	set_border_width(5);	
-	set_title("Image View [ Testing ]");
+	set_title("Visualizador de Imagens");
 
 	// box principal
 	add(VBox);
@@ -111,9 +115,19 @@ image_default("../resources/empty.png")
 		Gtk::Stock::QUIT),
 		sigc::mem_fun(*this, &Image_view::on_menu_file_quit));
 
+	// edit
+	menu_refActionGroup->add(Gtk::Action::create("EditMenu",
+		Gtk::Stock::EDIT));
+
+	menu_refCheckOne = Gtk::ToggleAction::create("HideButton",
+		"Ocultar botão");
+	menu_refActionGroup->add(menu_refCheckOne,
+		sigc::mem_fun(*this, &Image_view::on_hide_button_image));
+	menu_refCheckOne->set_active(true);
+
 	// choices menu, radio itens
 	// menu_refActionGroup->add(Gtk::Action::create("OptionsMenu",
-	// 	Gtk::Stock::EXECUTE));
+	// 	Gtk::Stock::PROPERTIES));
 
 	// Gtk::RadioAction::Group group_userlevel;
 	// menu_refOptionOne = Gtk::RadioAction::create(group_userlevel,
@@ -150,6 +164,9 @@ image_default("../resources/empty.png")
 		// "      <separator/>"
 		"      <menuitem action='FileQuit'/>"
 		"    </menu>"
+		"    <menu action='EditMenu'>"
+		"      <menuitem action='HideButton'/>"
+		"    </menu>"		
 		// "    <menu action='OptionsMenu'>"
 		// "      <menuitem action='OptionOne'/>"
 		// "      <menuitem action='OptionTwo'/>"
@@ -186,10 +203,11 @@ image_default("../resources/empty.png")
 			VBox_image[pos].set_spacing(2);
 			
 			image_lock[pos] = false;
+			swap_released[pos] = false;
 			image[pos].set(image_default);
 			if (pos == 0) image[pos].show();
 
-			button[pos].set_label("Reload");
+			button[pos].set_label("Abrir Nova Imagem");
 			button[pos].signal_clicked().connect(sigc::bind(sigc::mem_fun(*this,
 				&Image_view::on_button_clicked), pos));
 
@@ -198,9 +216,9 @@ image_default("../resources/empty.png")
 				(*this, &Image_view::on_combobox_changed), pos));
 
 			VBox_image[pos].pack_start(image[pos], true, true);
-			VBox_image[pos].pack_start(button[pos], true, true);
-			VBox_image[pos].pack_start(combobox_image[pos], true, true);
 			VBox_image[pos].pack_start(label_info[pos], true, true);
+			VBox_image[pos].pack_start(button[pos], true, true);
+			VBox_image[pos].pack_start(combobox_image[pos], true, true);					
 
 			VBox_image[pos].show();
 			HBox[i].pack_start(VBox_image[pos], true, true);
@@ -233,7 +251,7 @@ void Image_view::report(const std::string& message)
 void Image_view::update_image(const int& current_image)
 {
 	if (image_lock[current_image]) {
-		report("Loading blocked!");
+		report("Local bloqueado para troca de imagem!");
 		return;
 	}
 
@@ -241,7 +259,7 @@ void Image_view::update_image(const int& current_image)
 	report_terminal("Update Image [" + std::to_string(current_image + 1)+ "]");
 	report_terminal("Load new image ...");
 
-	Gtk::FileChooserDialog dialog("Open File", Gtk::FILE_CHOOSER_ACTION_OPEN);
+	Gtk::FileChooserDialog dialog("Abrir Arquivo", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_transient_for(*this);
 
 	dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_ACCEPT);
@@ -272,7 +290,7 @@ void Image_view::update_image(const int& current_image)
 	bool is_image = tools::check_filename_extension(path, tools::image_extension);
 
 	if (!is_imgp && !is_image) {
-			report("Invalid File: " + path);
+			report("Extensão inválida: " + path);
 			return;
 	}
 
@@ -288,7 +306,7 @@ void Image_view::update_image(const int& current_image)
 
 		v_map = load_imgp(path);	// ler arquivo tipo texto					
 		if (v_map.empty()) {
-			report("File with problems.\nCould not open.");
+			report("Erro ao abrir arquivo.");
 			return;
 		}
 
@@ -310,8 +328,8 @@ void Image_view::update_image(const int& current_image)
 		button[current_image].hide();	// não permitir atualização
 		combobox_image[current_image].show();
 
-		label_info[current_image].set_text("Last read IMGP file ["
-			+ std::to_string(current_image + 1) + "]: " + short_path(path));
+		label_info[current_image].hide();		
+		// label_info[current_image].set_text(short_path(path));
 		report_terminal("IMGP [" + std::to_string(current_image + 1) + "]");
 	}
 
@@ -319,16 +337,21 @@ void Image_view::update_image(const int& current_image)
 		report_terminal("Load image file ...");
 
 		image[current_image].set(path);
-		button[current_image].show();
+
+		if (menu_refCheckOne->get_active())
+			button[current_image].hide();
+		else
+			button[current_image].show();
+
+		swap_released[current_image] = true;
 		combobox_image[current_image].hide();
 
-		label_info[current_image].set_text("Last read IMAGE file ["
-			+ std::to_string(current_image + 1)	+ "]: " + short_path(path));
+		label_info[current_image].show();
+		label_info[current_image].set_text(short_path(path));
 		report_terminal("IMAGE [" + std::to_string(current_image + 1) + "]");
 	}
 
 	image[current_image].show();
-	label_info[current_image].show();
 	image_lock[current_image] = true;	// desbloquear somente pelo "Reload"
 	report_terminal("Image box [" + std::to_string(current_image + 1)
 	  + "]: lock!");
@@ -338,7 +361,7 @@ void Image_view::on_menu_file_new()
 {
 	image_created++;
 	if (image_created >= IMGROWS * IMGCOLS) {
-		report("Limit exceeded!");
+		report("Limite de imagens excedido!");
 		return;
 	}
 
@@ -362,6 +385,23 @@ void Image_view::on_menu_file_quit()
 	hide();
 }
 
+void Image_view::on_hide_button_image()
+{
+	if (menu_refCheckOne->get_active()) {
+		for (unsigned i = 0; i < IMGROWS * IMGCOLS; ++i) {
+			if (swap_released[i])
+				button[i].hide();
+		}		
+		report_terminal("Hide buttons.");
+	} else {
+		for (unsigned i = 0; i < IMGROWS * IMGCOLS; ++i) {
+			if (swap_released[i])
+				button[i].show();
+		}		
+		report_terminal("Show buttons.");
+	}
+}
+
 void Image_view::on_menu_option_one()
 {
 	if (menu_refOptionOne->get_active())
@@ -380,7 +420,7 @@ void Image_view::on_menu_option_two()
 
 void Image_view::on_menu_help_about()
 {
-	report("Simple Image Viewer.");
+	report("Interface gráfica para\nvisualização simples de imagens.");
 }
 
 void Image_view::on_button_clicked(const int& num_button)
@@ -403,7 +443,7 @@ void Image_view::on_combobox_changed(const int& option)
 	}
 
 	if (!tools::exist_path(source)) {
-		report("Image failure!");
+		report("Erro ao abrir arquivo!");
 		return;
 	}
 
@@ -419,7 +459,7 @@ std::string Image_view::short_path(const std::string& path)
 	std::string out("");
 	for (size_t i = path.size() - 1; i >= 0; --i) {
 		if (path[i] == '/') count++;
-		if (count == 4) break;
+		if (count == SHORT_PATH) break;
 		out = path[i] + out;
 	}
 	return out;
