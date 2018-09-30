@@ -36,11 +36,12 @@ int main ()
 		exit(0);
 	} 	
 
-	// inserindo texto dica, aproveitando o token ':' (separador)
+	// inserindo texto dica
+	// utilizar o '#' como no shell para evitar comflitos ao carregar .imgp
 	string text(
-	":\n"
-	": Laboratório básico\n"
-	": Workspace => LAB1\n");
+	"#\n"
+	"# Laboratório básico\n"
+	"# Workspace => LAB1\n");
 	tools::write(text, imgp_path);
 
 	/* ler arquivo .imgp gerado

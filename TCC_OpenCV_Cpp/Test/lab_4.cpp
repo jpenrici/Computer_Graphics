@@ -5,165 +5,104 @@
  *
  * Workspace LAB4
  *
- * Teste com foto real e com fundos retirados no GIMP.
- * Objetivo detectar as manchas nas folhas.
+ * Objetivo: Segmentar a folha, exalatando as partes (manchas e limbo).
  *
  */
 
-#include "opencv2/photo.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/core.hpp"	
-
 #include "../image_tools.hpp"
-
-#include <iostream>
-#include <unordered_map>
 
 using namespace std;
 using namespace cv;
 using namespace img_tools;
 
-#define MIN_VALUE 180
-#define MAX_VALUE 255
+#undef THRESH
+#define THRESH 70
+#undef MAX_VALUE
+#define MAX_VALUE 160
 
+// Novo mapa de diretórios
 static const std::unordered_map<std::string, std::string> map_lab = {
-	{"ORIGINAL"  , "."},
-	{"COPY"      , "/original"},
-	{"GRAYSCALE" , "/grayscale"},
-	{"BINARY_INV", "/binary_inv"},
-	{"SPOT"      , "/spot"},
+	{"ORIGINAL"			, "."},
+	{"COPY"      		, "/original"},
+	{"GRAYSCALE" 		, "/grayscale"},
+	{"BINARY"    		, "/binary"},
+	{"BINARY_INV"		, "/binary_inv"},
+	{"TEMP"       		, "/temp"},
+	{"RESULT"  			, "/result"},
 };
 
-Mat src_ori, src_gray, src_bin_inv, src_hsv, src_spot;
-vector<vector<string> > v_map;
-
-string search_path(const string& format, vector<vector<string> >& v)
+void save_image(Mat& src, const string& token, const string& suffix,
+	vector<vector<string> >& v_map)
 {
-	for (auto path: v) {
-		if (path.front() == format) return path.back();
-	}
-	return "EMPTY";
+	string path = search_path(token, v_map);
+	tools::add_suffix_filename(path, suffix);
+	imwrite(path, src);
 }
 
-void create_imgp_base(const string& workspace, const vector<string>& images,
-	const string& ext)
+void black2white(Mat& src)
 {
-	for (auto image: images) {
-		if (!tools::check_filename_extension(image, ext)) continue;
-		cout << "image: " << image << '\n';
-		save_imgp(image, workspace, map_lab);
-	}
-}
-
-void method_basic() {
-
-		// OPENCV - ORIGINAL
-		string path_ori = search_path("ORIGINAL", v_map);
-		cout << "OPENCV ORIGINAL: " << path_ori << '\n';
-
-		src_ori = imread(path_ori, IMREAD_COLOR);
-		if(src_ori.empty()) {
-	        cout << "could not open or find the image!\n";
-	        error(__LINE__, "ORIGINAL failure");
+	for (int y = 0; y < src.rows; ++y) {
+		for (int x = 0; x < src.cols; ++x) {
+			Vec3b color = src.at<Vec3b>(Point(y,x));
+			if (color[0] == 0 && color[1] == 0 && color[2] == 0) {
+				color[0] = 255;
+				color[1] = 255;
+				color[2] = 255;
+				src.at<Vec3b>(Point(y,x)) = color;
+			}
 		}
-
-		// OPENCV - COPY
-		string path_cp = search_path("COPY", v_map);
-		cout << "OPENCV COPY: " << path_cp << '\n';
-
-		imwrite(path_cp, src_ori);	
-
-		// OPENCV - GRAYSCALE
-		string path_gray = search_path("GRAYSCALE", v_map);
-		cout << "OPENCV GRAYSCALE: " << path_gray << '\n';
-
-		cvtColor(src_ori, src_gray, CV_BGR2GRAY);
-		imwrite(path_gray, src_gray);
-}
-
-void method_threshold() {
-
-		// OPENCV - BINARY_INV
-		string path_bin_inv = search_path("BINARY_INV", v_map);
-		tools::add_suffix_filename(path_bin_inv, "_" + to_string(MIN_VALUE)
-			+ "-" + to_string(MAX_VALUE));
-		cout << "OPENCV BINARY_INV: " << path_bin_inv << '\n';
-
-		threshold(src_gray, src_bin_inv, MIN_VALUE, MAX_VALUE, THRESH_BINARY_INV);
-		imwrite(path_bin_inv, src_bin_inv);
-}
-
-void method_hsv() {
-
-	// OPENCV - HSV
-	string path_spot = search_path("SPOT", v_map);
-	cout << "OPENCV HSV:" << path_spot << '\n';
-
-	cvtColor(src_ori, src_hsv, CV_BGR2HSV);
-
-	string path_hsv = path_spot;
-	tools::add_suffix_filename(path_hsv, "_hsv");
-	imwrite(path_hsv, src_hsv);
-
-	Mat src_temp;
-	inRange(src_hsv, Scalar(20, 10, 10), Scalar(90, 255, 255), src_temp);
-	bitwise_not(src_temp, src_spot, src_bin_inv);
-
-	tools::add_suffix_filename(path_spot, "_spot");
-	imwrite(path_spot, src_spot);
-}
-
-void method_main(const vector<string>& images) {
-
-	for (auto image: images) {
-		
-		if (!tools::exist_path(image)) {
-			cout << "IMGP failure!" << '\n';
-			continue;
-		}		
-
-		cout << '\n';
-		cout << "reload .imgp : " << image << '\n';
-		v_map = load_imgp(image);
-
-		// Sequência de Métodos
-		method_basic();
-		method_threshold();
-		method_hsv();
 	}
-}	
-
-void image_processing(const string& new_workspace, const string& folder, 
-	const string& ext)
-{
-	// passo 1 - checar se diretório de imagens existe
-	if (!tools::exist_path(folder)) {
-		cout << "folder failure\n";
-		exit(0);
-	}	
-
-	// passo 2 - criar workspace com MAP customizado
-	method_name = tools::lower(new_workspace) + "_";
-	create_workspace(new_workspace, map_lab);
-
-	// passo 3 - listar arquivos de imagens alvo
-	vector<string> images;
-	tools::files(images, folder);
-
-	// passo 4 - gerar os arquivos de gerencia
-	create_imgp_base(new_workspace, images, ext);
-	cout << '\n';
-
-	// passo 5 - processar para cada .imgp as imagens
-	tools::files(images, new_workspace + "/imgp");
-	method_main(images);	
 }
+
+void method_segmentation(vector<vector<string> >& v_map) {
+
+	cout << "segmentation ...\n";
+
+	Mat src_ori, src_bin, temp;
+	Mat hsv, mask_hsv, result_leaf, result_spot;
+
+	// Recuperando imagens
+	load_image(src_ori, "COPY", v_map, IMREAD_COLOR);
+	load_image(src_bin, "BINARY_INV", v_map, IMREAD_GRAYSCALE);
+
+	// Removendo o fundo
+	bitwise_and(src_ori, src_ori, temp, src_bin);
+	src_ori = temp.clone();
+
+	// RGB para HSV
+	cvtColor(src_ori, hsv, COLOR_BGR2HSV);
+	save_image(hsv, "TEMP", "_hsv", v_map);
+
+	// Separar a folha das manchas, pelo tom de verde
+	inRange(hsv, Scalar(38, 60, 60), Scalar(60, 255, 160), mask_hsv);
+	bitwise_and(src_ori, src_ori, result_leaf, mask_hsv);
+	black2white(result_leaf);
+	save_image(mask_hsv, "TEMP", "_mask_hsv", v_map);	
+	save_image(result_leaf, "RESULT", "_leaf", v_map);
+
+	// Separar as manchas	
+	threshold(mask_hsv, mask_hsv, 1, 255, THRESH_BINARY_INV);
+	bitwise_and(src_ori, src_ori, result_spot, mask_hsv);
+	black2white(result_spot);
+	save_image(mask_hsv, "TEMP", "_mask_hsv_inv", v_map);	
+	save_image(result_spot, "RESULT", "_spot", v_map);
+}	
 
 int main()
 {
-	image_processing("LAB4", "../Images/images_test", "jpg");
+	string new_workspace(tools::current_dir() + "/LAB4");
+	string new_method_name = "lab4_";
+	string new_folder = "../Images/images_test/leaf_disease";
+	string new_extension = "png";
+
+	bath(new_workspace, new_method_name, new_folder, new_extension, map_lab);
+
+	vector<string> imgps = list_imgp(new_workspace);
+	vector<vector<string> > v_map;
+	for (auto imgp: imgps) {
+		v_map = load_imgp(imgp);
+		method_segmentation(v_map);
+	}
 
 	return 0;
 }

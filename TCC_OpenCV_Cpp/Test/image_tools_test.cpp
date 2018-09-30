@@ -39,7 +39,7 @@ void test_1()
 
 	test(__LINE__);
 	for (auto value: v_test) {
-		if (value.front() == "WORKSPACE" ||
+		if (value.front() == "#WORKSPACE" ||
 			value.front() == "ORIGINAL")
 			continue;
 
