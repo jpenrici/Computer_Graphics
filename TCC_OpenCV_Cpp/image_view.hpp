@@ -15,7 +15,7 @@
 class Image_view : public Gtk::Window {
 
 #define IMGROWS 2
-#define IMGCOLS 2
+#define IMGCOLS 3
 #define SHORT_PATH 1	
 
 public:
