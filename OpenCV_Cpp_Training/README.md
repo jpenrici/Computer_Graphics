@@ -1,4 +1,4 @@
-# Requirements
+## Requirements
    
     cmake
     pkg-config
@@ -14,6 +14,10 @@
 	 ./<filenameRun>
 
 	
-# Reference source
+## Reference source
 
     https://docs.opencv.org
+
+## Screenshot
+
+![screenshot](https://github.com/jpenrici/Computer_Graphics/blob/master/OpenCV_Cpp_Training/Threshold/images/display_image.png)
