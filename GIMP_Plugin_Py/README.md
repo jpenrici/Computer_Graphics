@@ -3,7 +3,7 @@ Gimp_Plugin_Py
 
 Image experiments using Gimp-Python.
 
-[README Pt-BR]()
+[README-pt-BR](https://github.com/jpenrici/Computer_Graphics/blob/master/GIMP_Plugin_Py/README-pt-BR.md)
 
 Default installation
 ====================
