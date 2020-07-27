@@ -14,9 +14,9 @@ Instalação
 Requerimentos
 =============
 
-	- [OpenCV] (https://opencv.org/)
-	- [NumPy](https://numpy.org/)
-	- [Virtualenv](https://pypi.org/project/virtualenv/) (Opcional)
+[OpenCV](https://opencv.org/)
+[NumPy](https://numpy.org/)
+[Virtualenv](https://pypi.org/project/virtualenv/) (Opcional)
 
 Referências
 ===========
