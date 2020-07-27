@@ -5,11 +5,11 @@ Neste plug-in é experimentado a potencialidade do OpenCV e do GIMP Plugin para 
 
 Instalação
 ==========
-[1] Instale OpenCV e NumPy para a versão Python 2.7, conforme indicação dos sites oficiais. 
-[2] Seguir os passos da instalação padrão de um GIMP Plugin.
-[3] Copie os arquivos `gimp_plugin_faceDetection.py`, `haarcascade_frontalface_default.xml` e `install_dependencies.sh` para o diretório `plug-ins`.
-[4] No Linux, se necessário, instale o `virtualenv`. Dê permissão ao arquivo `install_dependencies.sh` e execute o código.
-[5] Siga os passos finais da instalação GIMP Plugin padrão.
+[1] Instale OpenCV e NumPy para a versão Python 2.7, conforme indicação dos sites oficiais. <br>
+[2] Seguir os passos da instalação padrão de um GIMP Plugin. <br>
+[3] Copie os arquivos `gimp_plugin_faceDetection.py`, `haarcascade_frontalface_default.xml` e `install_dependencies.sh` para o diretório `plug-ins`. <br>
+[4] No Linux, se necessário, instale o `virtualenv`. Dê permissão ao arquivo `install_dependencies.sh` e execute o código. <br>
+[5] Siga os passos finais da instalação GIMP Plugin padrão. <br>
 
 Requerimentos
 =============
