@@ -19,13 +19,13 @@ Requeriments
 
 [OpenCV](https://opencv.org/) <br>
 [NumPy](https://numpy.org/) <br>
-[Virtualenv](https://pypi.org/project/virtualenv/) (Opcional) <br>
+[Virtualenv](https://pypi.org/project/virtualenv/) (Optional) <br>
 
 References
 ==========
 
-[OpenCV](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html) Detecção de Faces usando Haar Cascades. <br>
+[OpenCV](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html) Face detection using Haar Cascades. <br>
 [GIMP Developer](https://developer.gimp.org/plug-ins.html) Tutorial GIMP Plugin. <br>
-[Paul Bourke](http://paulbourke.net/) Algoritmos de Computação Gráfica. <br>
-[Akkana e Joao](https://shallowsky.com/blog/gimp/pygimp-pixel-ops.html) Algoritmo de operações de pixel no GIMP. <br>
-[Kritik Soman](https://arxiv.org/abs/2004.13060) Inspiração no uso de GIMP Python Plugins em Visão Computacional. <br>
+[Paul Bourke](http://paulbourke.net/) Computer Graphics Algorithms. <br>
+[Akkana e Joao](https://shallowsky.com/blog/gimp/pygimp-pixel-ops.html) Pixel operations algorithm in GIMP. <br>
+[Kritik Soman](https://arxiv.org/abs/2004.13060) Inspiration in the use of GIMP Python Plugins in Computer Vision. <br>
