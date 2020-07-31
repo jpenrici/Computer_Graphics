@@ -17,11 +17,9 @@ Default installation
 [6] Restart the GIMP. <br>
 [7] Check if the plug-in is active for use by accessing the corresponding menu. <br>
 
-**Preferences in GIMP 2.8**
+**Preferences**
 ![GIMP 2.8 - Menu Preferências](https://github.com/jpenrici/Computer_Graphics/blob/master/GIMP_Plugin_Py/Display/linux_gimp_apt-install_preferences_folders_plugin.png)
 
-**Preferences in GIMP 2.10**
-![GIMP 2.10 - Menu Preferências](https://github.com/jpenrici/Computer_Graphics/blob/master/GIMP_Plugin_Py/Display/linux_gimp_flatpak_preferences_folders_plugin.png)
 
 References
 ===========

@@ -44,13 +44,13 @@ try:
     import numpy as np
     log += "numpy " + np.__version__ + " ... ok\n"
 except ImportError as err:
-    logError += err + " not found\n"
+    logError += str(err) + " not found\n"
     dependencies = False
 try:
     import cv2 as cv
     log += "opencv " + cv.__version__ + " ... ok\n"
 except ImportError as err:
-    logError += err + " not found\n"
+    logError += str(err) + " not found\n"
     dependencies = False
 
 if not os.path.isfile(CASCADE_PATH):
@@ -60,7 +60,7 @@ else:
     log += CASCADE_PATH + " ... ok\n"
 
 log += logError
-
+print(log)
 
 def message(msg):
     pdb.gimp_message(msg)

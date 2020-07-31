@@ -24,8 +24,8 @@ Requeriments
 References
 ==========
 
-[OpenCV](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html) Face detection using Haar Cascades. <br>
-[GIMP Developer](https://developer.gimp.org/plug-ins.html) Tutorial GIMP Plugin. <br>
-[Paul Bourke](http://paulbourke.net/) Computer Graphics Algorithms. <br>
-[Akkana e Joao](https://shallowsky.com/blog/gimp/pygimp-pixel-ops.html) Pixel operations algorithm in GIMP. <br>
-[Kritik Soman](https://arxiv.org/abs/2004.13060) Inspiration in the use of GIMP Python Plugins in Computer Vision. <br>
+[OpenCV](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html) : Face detection using Haar Cascades. <br>
+[GIMP Developer](https://developer.gimp.org/plug-ins.html) : Tutorial GIMP Plugin. <br>
+[Paul Bourke](http://paulbourke.net/) : Computer Graphics Algorithms. <br>
+[Akkana e Joao](https://shallowsky.com/blog/gimp/pygimp-pixel-ops.html) : Pixel operations algorithm in GIMP. <br>
+[Kritik Soman](https://arxiv.org/abs/2004.13060) : Inspiration in the use of GIMP Python Plugins in Computer Vision. <br>
