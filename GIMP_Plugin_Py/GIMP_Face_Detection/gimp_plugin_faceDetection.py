@@ -59,8 +59,8 @@ if not os.path.isfile(CASCADE_PATH):
 else:
     log += CASCADE_PATH + " ... ok\n"
 
-log += logError
-print(log)
+log += logError + "...\n"
+# print(log)
 
 def message(msg):
     pdb.gimp_message(msg)
@@ -117,8 +117,8 @@ def faceDetection(img, layer):
 
     try:
         # OpenCV
-        img_copy = pxRgnToNumpy(layer)
-        img_gray = cv.cvtColor(img_copy, cv.COLOR_BGR2GRAY)
+        img_copy = pxRgnToNumpy(layer)  # RGB*
+        img_gray = cv.cvtColor(img_copy, cv.COLOR_RGB2GRAY)
         log += layer.name + " to npArray ...\n"
 
         clf = cv.CascadeClassifier(CASCADE_PATH)
@@ -134,7 +134,11 @@ def faceDetection(img, layer):
             name = layer.name + " faces"
             createNewLayer(img, name, img_copy)
             log += img.name + " create layer " + name + " ...\n"
-            # cv.imwrite("temp_" + layer.name, img_copy)
+
+            # exportação via OpenCV (opcional)
+            img_out = cv.cvtColor(img_copy, cv.COLOR_BGR2RGB)
+            cv.imwrite("temp_" + layer.name, img_out)
+
         else:
             message("detection not possible.")
 
