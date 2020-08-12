@@ -20,7 +20,10 @@ if [ ! -d "pyenv" ]; then
 	python2.7 -m pip install --user virtualenv
 	python2.7 -m virtualenv pyenv
 	source pyenv/bin/activate
-	python2.7 -m pip install numpy
+	python2.7 -m pip install --upgrade pip
+	python2.7 -m pip install Cython
+	# python2.7 -m pip install numpy
+	# python2.7 -m pip install pandas
 	python2.7 -m pip install opencv-python
 # 	python2.7 -m pip install scikit-image
 	deactivate

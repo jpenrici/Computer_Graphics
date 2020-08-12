@@ -1,4 +1,4 @@
-# -*- Mode: Python; coding: utf-8; indent-tabs-mpythoode: nil; tab-width: 4 -*-
+# -*- Mode: Python2; coding: utf-8; indent-tabs-mpythoode: nil; tab-width: 4 -*-
 
 '''
     Face Detection with OpenCV
@@ -37,7 +37,7 @@ CASCADE_PATH = PATH + "/haarcascade_frontalface_default.xml"
 
 # Log
 now = datetime.datetime.now()
-log = "\nGIMP: " + str(now.strftime("%b %d %Y %H:%M:%S"))
+log = "\nGIMP: " + str(now.strftime("%Y-%m-%d %H:%M:%S"))
 log += "\nPlug-in: " + LABEL + '\n'
 logError = "Unexpected error: "
 
@@ -69,7 +69,8 @@ if not os.path.isfile(CASCADE_PATH):
 else:
     log += CASCADE_PATH + " ... ok\n"
 
-log += logError + " ...\n"
+if (not dependencies):
+     log += logError
 # print(log)
 
 
@@ -102,7 +103,7 @@ def lastLayer(img):
 
 
 def saveLog(text):
-    filename = "LogGimpPlugin" + str(now.strftime("%b%d%Y_%H%M%S")) + ".txt"
+    filename = "LogGimpPlugin_" + str(now.strftime("%Y%m%d_%H%M%S")) + ".txt"
     try:
         filename = open(filename, "w")
         filename.write(text)
