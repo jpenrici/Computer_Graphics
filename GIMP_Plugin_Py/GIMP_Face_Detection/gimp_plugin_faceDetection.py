@@ -32,6 +32,7 @@ HELP = globals()["__doc__"]
 FULL_PATH = os.path.realpath(__file__)
 PATH, FILENAME = os.path.split(FULL_PATH)
 ENV = PATH + "/pyenv/lib/python2.7"
+HAAR_MODEL = "haarcascade_frontalface_default.xml"
 
 # Log
 now = datetime.datetime.now()
@@ -60,26 +61,27 @@ except ImportError as err:
 try:
     import cv2 as cv
     log += "opencv " + cv.__version__ + " ... ok\n"
-    
-    haar_model = "haarcascade_frontalface_default.xml"
-	cascade_path = os.path.join(os.path.dirname(os.path.abspath(cv.__file__)),
-				"data/" + haar_model)
-	if not os.path.isfile(cascade_path):
-		logError += cascade_path + " not found\n"
-		cascade_path = PATH + "/" + haar_model
-
+    cascade_path = os.path.join(os.path.dirname(os.path.abspath(cv.__file__)),
+                                "data/" + HAAR_MODEL)
 except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
 
 if not os.path.isfile(cascade_path):
     logError += cascade_path + " not found\n"
+    cascade_path = ENV + "/site-packages/cv2/data/" + HAAR_MODEL
+elif not os.path.isfile(cascade_path):
+    logError += cascade_path + " not found\n"
+    cascade_path = PATH + "/" + HAAR_MODEL
+elif not os.path.isfile(cascade_path):
+    logError += cascade_path + " not found\n"
     dependencies = False
-else:
+
+if os.path.isfile(cascade_path):
     log += cascade_path + " ... ok\n"
 
 if (not dependencies):
-     log += logError
+    log += logError
 # print(log)
 
 
