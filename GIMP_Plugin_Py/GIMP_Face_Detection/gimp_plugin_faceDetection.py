@@ -31,9 +31,7 @@ HELP = globals()["__doc__"]
 # Local
 FULL_PATH = os.path.realpath(__file__)
 PATH, FILENAME = os.path.split(FULL_PATH)
-
 ENV = PATH + "/pyenv/lib/python2.7"
-CASCADE_PATH = PATH + "/haarcascade_frontalface_default.xml"
 
 # Log
 now = datetime.datetime.now()
@@ -49,25 +47,36 @@ else:
                      ENV + "/site-packages/setuptools"])
 
 # Dependências
+cascade_path = ""
 dependencies = True
+
 try:
     import numpy as np
     log += "numpy " + np.__version__ + " ... ok\n"
 except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
+
 try:
     import cv2 as cv
     log += "opencv " + cv.__version__ + " ... ok\n"
+    
+    haar_model = "haarcascade_frontalface_default.xml"
+	cascade_path = os.path.join(os.path.dirname(os.path.abspath(cv.__file__)),
+				"data/" + haar_model)
+	if not os.path.isfile(cascade_path):
+		logError += cascade_path + " not found\n"
+		cascade_path = PATH + "/" + haar_model
+
 except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
 
-if not os.path.isfile(CASCADE_PATH):
-    logError += CASCADE_PATH + " not found\n"
+if not os.path.isfile(cascade_path):
+    logError += cascade_path + " not found\n"
     dependencies = False
 else:
-    log += CASCADE_PATH + " ... ok\n"
+    log += cascade_path + " ... ok\n"
 
 if (not dependencies):
      log += logError
@@ -135,7 +144,7 @@ def faceDetection(img, layer, option):
         img_gray = cv.cvtColor(img_copy, cv.COLOR_RGB2GRAY)
         log += layer.name + " to npArray ...\n"
 
-        clf = cv.CascadeClassifier(CASCADE_PATH)
+        clf = cv.CascadeClassifier(cascade_path)
         faces = clf.detectMultiScale(img_gray, 1.3, 5)
 
         hits = len(faces)
