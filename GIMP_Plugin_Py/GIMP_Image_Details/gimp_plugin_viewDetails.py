@@ -76,7 +76,32 @@ def pxRgnToArray(layer):
 def pxRgnToNumpy(layer):
     values = pxRgnToArray(layer)
     npArray = np.array(values, dtype=np.uint8)
-    return npArray.reshape(layer.height, layer.width, layer.bpp) # matriz
+    return npArray.reshape(layer.height, layer.width, layer.bpp)  # matriz
+
+
+def pxRgnToTxt(layer):
+    # função lenta para matriz com muitos pixels
+    text = ""
+    values = pxRgnToArray(layer)
+
+    i = 1
+    j = 1
+    for v in values:
+        text += str(v)
+        if (i < layer.bpp):
+            text += ','
+            i += 1
+        else:
+            i = 1
+            if (j < (layer.width)):
+                text += ';'
+                j += 1
+            else:
+                pdb.gimp_progress_pulse()
+                text += '\n'
+                j = 1
+
+    return text
 
 
 def exportTxt(filename, text):
@@ -93,7 +118,7 @@ def saveLog(text):
     exportTxt(filename, text)
 
 
-def viewDetails(img, layer, dir, export):
+def viewDetails(img, layer, directory, export):
 
     global log
 
@@ -107,20 +132,28 @@ def viewDetails(img, layer, dir, export):
     gimp.progress_init(inform)
 
     log += inform + '\n'
-    filename = (layer.name).replace('.', '_')  # export
+    filename = directory + "/" + (layer.name).replace('.', '_')  # export
 
     try:
         img_copy = pxRgnToNumpy(layer)
         log += layer.name + " to npArray ...\n"
 
         if (export):
-
-            # salvar matriz de pixels em Txt
-            np.savetxt(filename + ".txt", img_copy, fmt='%s', delimiter=';')
+            start = datetime.datetime.now()
+            log += "local: " + directory + " ...\n"
+            log += layer.name + " export data ...\n"
 
             # salvar matriz de pixels em dados Numpy
+            pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
 
+            # salvar matriz de pixels em Txt
+            pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
+            exportTxt(filename + ".txt", pxRgnToTxt(layer))
+            pdb.gimp_progress_set_text("saving TXT file ...")
+
+            end = datetime.datetime.now()
+            log += "time: " + str((end - start).seconds) + " seconds ...\n"
 
     except Exception as err:
         log += "[Error - Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'
@@ -146,8 +179,8 @@ register(
     [   # parâmetros de entrada do método
         (PF_IMAGE, "img", _("_Image"), None),
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
-        (PF_DIRNAME, "dir", _("Directory"), HOME),
-        (PF_BOOL, "export", _("Export Data"), True)
+        (PF_DIRNAME, "directory", _("Directory"), HOME),
+        (PF_BOOL, "export", _("Export Matrix Data"), False)
     ],
     [], # parâmetros de saída do método
     viewDetails,           # nome de chamada do método
