@@ -21,7 +21,7 @@ from gimpfu import *
 
 # Descrição
 LABEL = "View Details"
-INFO = "Use advanced libraries to detail the image."
+INFO = "Use advanced libraries to detail the image.\nSelect the exported data."
 HELP = globals()["__doc__"]
 
 # Local
@@ -118,9 +118,14 @@ def saveLog(text):
     exportTxt(filename, text)
 
 
-def viewDetails(img, layer, directory, export):
+def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
 
     global log
+
+    if (not (saveSummary or saveDataNp or saveDataTxt)):
+        log += "nothing to do ...\n"
+        print(log)
+        return
 
     # Checar dependências
     if (not dependencies):
@@ -138,26 +143,29 @@ def viewDetails(img, layer, directory, export):
         img_copy = pxRgnToNumpy(layer)
         log += layer.name + " to npArray ...\n"
 
-        if (export):
-            start = datetime.datetime.now()
-            log += "local: " + directory + " ...\n"
-            log += layer.name + " export data ...\n"
+        # local para exportação de dados
+        log += "local: " + directory + " ...\n"
 
-            # salvar matriz de pixels em dados Numpy
+        if (saveDataNp):
+            # salvar matriz Numpy
+            log += layer.name + " ... export data: Numpy ...\n"
             pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
 
+        if (saveDataTxt):
             # salvar matriz de pixels em Txt
+            start = datetime.datetime.now()
             pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
             exportTxt(filename + ".txt", pxRgnToTxt(layer))
             pdb.gimp_progress_set_text("saving TXT file ...")
-
             end = datetime.datetime.now()
+            log += layer.name + " ... export data: Txt ... "
             log += "time: " + str((end - start).seconds) + " seconds ...\n"
 
     except Exception as err:
         log += "[Error - Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'
         gimp.message(LABEL + " failed.")
+        saveLog(log)
 
     pdb.gimp_progress_end()
 
@@ -179,8 +187,10 @@ register(
     [   # parâmetros de entrada do método
         (PF_IMAGE, "img", _("_Image"), None),
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
-        (PF_DIRNAME, "directory", _("Directory"), HOME),
-        (PF_BOOL, "export", _("Export Matrix Data"), False)
+        (PF_DIRNAME, "directory", _("Local"), HOME),
+        (PF_BOOL, "saveSummary", _("Summary"), True),
+        (PF_BOOL, "saveDataNp", "Matrix Numpy", False),
+        (PF_BOOL, "saveDataTxt", "Data Text", False),
     ],
     [], # parâmetros de saída do método
     viewDetails,           # nome de chamada do método
