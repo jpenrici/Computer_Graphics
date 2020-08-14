@@ -185,7 +185,7 @@ def faceDetection(img, layer, option):
         log += inform + " ok\n"
 
     except Exception as err:
-        log += "[Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'
+        log += "[Error - Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'
         gimp.message(LABEL + " failed.")
 
     pdb.gimp_progress_end()
