@@ -31,8 +31,8 @@ PATH, FILENAME = os.path.split(FULL_PATH)
 ENV = PATH + "/pyenv/lib/python2.7"
 
 # Log
-now = datetime.datetime.now()
-log = "\nGIMP: " + str(now.strftime("%Y-%m-%d %H:%M:%S"))
+now = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+log = "\nGIMP: " + now
 log += "\nPlug-in: " + LABEL + '\n'
 logError = "Unexpected error: "
 
@@ -60,7 +60,7 @@ except ImportError as err:
 
 if (not dependencies):
     log += logError
-#print(log)
+# print(log)
 
 
 def message(msg):
@@ -80,7 +80,7 @@ def pxRgnToNumpy(layer):
 
 
 def pxRgnToTxt(layer):
-    # função lenta para matriz com muitos pixels
+    # Função lenta para matriz com muitos pixels
     text = ""
     values = pxRgnToArray(layer)
 
@@ -105,6 +105,9 @@ def pxRgnToTxt(layer):
 
 
 def exportTxt(filename, text):
+    filename = filename.replace("-", "")
+    filename = filename.replace(":", "")
+    filename = filename.replace(" ", "_")
     try:
         filename = open(filename, "w")
         filename.write(text)
@@ -114,14 +117,40 @@ def exportTxt(filename, text):
 
 
 def saveLog(text):
-    filename = "LogGimpPlugin_" + str(now.strftime("%Y%m%d_%H%M%S")) + ".txt"
+    filename = "LogGimpPlugin_" + now + ".txt"
     exportTxt(filename, text)
+
+
+def detailsNp(npArray):
+    # Detalhes obtidos do Numpy
+    text = ""
+    height, width, channels = npArray.shape
+    max_value = str(np.amax(npArray))
+    min_value = str(np.amin(npArray))
+
+    text = "matrix: " + str(height) + " x " + str(width)
+    text += "\nvalues(min, max): " + min_value + ", " + max_value
+
+    if (npArray.ndim >= 3):
+        # Valores máximos por canal
+        max_r = str(np.amax(npArray[:, :, 0]))
+        max_g = str(np.amax(npArray[:, :, 1]))
+        max_b = str(np.amax(npArray[:, :, 2]))
+        text += "\nmax(R,G,B): " + max_r + ", " + max_g + ", " + max_b
+        # Valores mínimos por canal
+        min_r = str(np.amin(npArray[:, :, 0]))
+        min_g = str(np.amin(npArray[:, :, 1]))
+        min_b = str(np.amin(npArray[:, :, 2]))
+        text += "\nmix(R,G,B): " + min_r + ", " + min_g + ", " + min_b
+
+    return text
 
 
 def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
 
     global log
 
+    # Checar solicitações
     if (not (saveSummary or saveDataNp or saveDataTxt)):
         log += "nothing to do ...\n"
         print(log)
@@ -143,17 +172,27 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
         img_copy = pxRgnToNumpy(layer)
         log += layer.name + " to npArray ...\n"
 
-        # local para exportação de dados
+        # Detalhes
+        summary = layer.name + "\n" + now + "\n"
+        summary += detailsNp(img_copy)
+        message(summary)
+
+        # Local para exportação de dados
         log += "local: " + directory + " ...\n"
 
+        if (saveSummary):
+            # Salvar informações úteis
+            log += layer.name + " ... export Summary ...\n"
+            exportTxt(filename + "_summary_" + now + ".txt", summary)
+
         if (saveDataNp):
-            # salvar matriz Numpy
+            # Salvar matriz Numpy
             log += layer.name + " ... export data: Numpy ...\n"
             pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
 
         if (saveDataTxt):
-            # salvar matriz de pixels em Txt
+            # Salvar matriz de pixels em Txt para uso em planilhas
             start = datetime.datetime.now()
             pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
             exportTxt(filename + ".txt", pxRgnToTxt(layer))
