@@ -52,8 +52,8 @@ except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
 try:
-    import pandas
-    log += "pandas " + np.__version__ + " ... ok\n"
+    import pandas as pd
+    log += "pandas " + pd.__version__ + " ... ok\n"
 except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
@@ -131,7 +131,7 @@ def detailsNp(npArray):
     text = "matrix: " + str(height) + " x " + str(width)
     text += "\nvalues(min, max): " + min_value + ", " + max_value
 
-    if (npArray.ndim >= 3):
+    if (npArray.ndim == 3):
         # Valores máximos por canal
         max_r = str(np.amax(npArray[:, :, 0]))
         max_g = str(np.amax(npArray[:, :, 1]))
@@ -146,12 +146,37 @@ def detailsNp(npArray):
     return text
 
 
-def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
+def detailsPd(layer):
+    # Detalhes obtidos do Pandas
+
+    if (layer.bpp != 3):
+        # Somente imagens RGB
+        return
+
+    # Array
+    rgb_list = pxRgnToArray(layer)
+    rgb = ['R', 'G', 'B']
+    h = layer.height
+    w = layer.width
+
+    names = ['y', 'x', None]
+    index = pd.MultiIndex.from_product([range(h), range(w), rgb], names=names)
+
+    # Data Frame
+    df = pd.Series(rgb_list, index=index)
+    df = df.unstack()
+    df = df.reset_index().reindex(columns=['x', 'y'] + rgb)
+
+    return df
+
+
+def viewDetails(img, layer, directory, saveSummary, saveDataNp,
+                saveDataPd, saveDataTxt):
 
     global log
 
     # Checar solicitações
-    if (not (saveSummary or saveDataNp or saveDataTxt)):
+    if (not (saveSummary or saveDataNp or saveDataPd or saveDataTxt)):
         log += "nothing to do ...\n"
         print(log)
         return
@@ -173,9 +198,16 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
         log += layer.name + " to npArray ...\n"
 
         # Detalhes
-        summary = layer.name + "\n" + now + "\n"
-        summary += detailsNp(img_copy)
-        message(summary)
+        summary = layer.name + '\n'
+        message(summary + "Check summary in " + filename + ".txt")
+
+        summary += now + '\n'
+        summary += "\nNumpy:\n"
+        summary += detailsNp(img_copy) + '\n'
+
+        summary += "\nPandas:\n"
+        df = detailsPd(layer)
+        summary += df.describe().to_string() + '\n'
 
         # Local para exportação de dados
         log += "local: " + directory + " ...\n"
@@ -191,8 +223,21 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp, saveDataTxt):
             pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
 
+        if (saveDataPd):
+            log += layer.name + " ... export data: Pandas ...\n"
+            pdb.gimp_progress_set_text("saving Pandas files ...")
+
+            # Salvar no formato Python Pickle
+            df.to_pickle(filename + ".pkl")
+            log += "saving Python Pickle Format ...\n"
+
+            # Salvar no formato CSV
+            df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
+            log += "saving CSV ...\n"
+
         if (saveDataTxt):
             # Salvar matriz de pixels em Txt para uso em planilhas
+            # Texto: R,G,B; ... ;R,G,B; ...
             start = datetime.datetime.now()
             pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
             exportTxt(filename + ".txt", pxRgnToTxt(layer))
@@ -228,8 +273,9 @@ register(
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
         (PF_DIRNAME, "directory", _("Local"), HOME),
         (PF_BOOL, "saveSummary", _("Summary"), True),
-        (PF_BOOL, "saveDataNp", "Matrix Numpy", False),
-        (PF_BOOL, "saveDataTxt", "Data Text", False),
+        (PF_BOOL, "saveDataNp", "Data Numpy", False),
+        (PF_BOOL, "saveDataPd", "Data Pandas", False),
+        (PF_BOOL, "saveDataTxt", "Data Text (Slow)", False),
     ],
     [], # parâmetros de saída do método
     viewDetails,           # nome de chamada do método
