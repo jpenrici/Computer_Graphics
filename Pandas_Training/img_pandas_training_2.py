@@ -18,7 +18,7 @@ def test(filename):
     print("Size: ", img.size)
     print("Shape: ", img.shape)
 
-    height, width, channels = img.shape  # (x, y, z)
+    height, width, channels = img.shape  # (y, x, z)
 
     if (channels > 3):
         img = img[:, :, :3]
