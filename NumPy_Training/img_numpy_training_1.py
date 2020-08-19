@@ -1,5 +1,6 @@
 # -*- Mode: Python3; coding: utf-8; indent-tabs-mpythoode: nil; tab-width: 4 -*-
 
+import os
 import numpy as np
 from PIL import Image
 
@@ -21,12 +22,12 @@ def details(data):
                         data.dtype))
 
     result = "maximum values: {0}\nmax. values RGB: {1},{2},{3}"
-    print(result.format(np.amax(data), np.amax(data[:,:,RED]),
-                        np.amax(data[:,:,GREEN]), np.amax(data[:,:,BLUE])))
+    print(result.format(np.amax(data), np.amax(data[:, :, RED]),
+                        np.amax(data[:, :, GREEN]), np.amax(data[:, :, BLUE])))
 
-    result = "minimum values: {0}\nmin. values RGB: {1},{2},{3}"
-    print(result.format(np.amin(data), np.amin(data[:,:,RED]),
-                        np.amin(data[:,:,GREEN]), np.amin(data[:,:,BLUE])))
+    result = "minimum values: {0}\nmin. values RGB: {1},{2},{3}\n"
+    print(result.format(np.amin(data), np.amin(data[:, :, RED]),
+                        np.amin(data[:, :, GREEN]), np.amin(data[:, :, BLUE])))
 
 
 def saveImg(filename, data):
@@ -40,6 +41,10 @@ def test(filename):
 
     img_np = PATH + filename + ".npy"  # matriz RGB de imagem gerada no GIMP
     print("Data: ", img_np)
+
+    if not os.path.exists(img_np):
+        print("File not found!")
+        return
 
     rgba = np.load(img_np)
     details(rgba)
