@@ -206,8 +206,14 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
         summary += detailsNp(img_copy) + '\n'
 
         summary += "\nPandas:\n"
-        df = detailsPd(layer)
-        summary += df.describe().to_string() + '\n'
+        if (layer.bpp == 3):
+            # Implementar análise para RGBA
+            df = detailsPd(layer)
+            log += layer.name + " to Pandas Data Frame ...\n"
+            summary += df.describe().to_string() + '\n'
+        else:
+            summary += "Unanalyzed image.\n"
+            saveDataPd = False
 
         # Local para exportação de dados
         log += "local: " + directory + " ...\n"
@@ -222,6 +228,7 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             log += layer.name + " ... export data: Numpy ...\n"
             pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
+            log += "saving Numpy file ...\n"
 
         if (saveDataPd):
             log += layer.name + " ... export data: Pandas ...\n"
@@ -229,11 +236,11 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
 
             # Salvar no formato Python Pickle
             df.to_pickle(filename + ".pkl")
-            log += "saving Python Pickle Format ...\n"
+            log += "saving Pandas Data Frame to Python Pickle Format ...\n"
 
             # Salvar no formato CSV
             df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
-            log += "saving CSV ...\n"
+            log += "saving Pandas Data Frame to CSV ...\n"
 
         if (saveDataTxt):
             # Salvar matriz de pixels em Txt para uso em planilhas
