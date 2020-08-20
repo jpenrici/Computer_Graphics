@@ -39,7 +39,8 @@ def saveImg(filename, data):
 
 def test(filename):
 
-    img_np = PATH + filename + ".npy"  # matriz RGB de imagem gerada no GIMP
+    # matriz RGB de imagem gerada no GIMP Plugin (gimp_plugin_viewDetails.py)
+    img_np = PATH + filename + ".npy"
     print("Data: ", img_np)
 
     if not os.path.exists(img_np):
