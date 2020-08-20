@@ -22,6 +22,7 @@ def view(data, title="histogram"):
 
     print(hist, bins, sep='\n')
 
+
 def test(filename):
 
     img_np = PATH + filename + ".npy"

@@ -58,7 +58,7 @@ except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
 
-if (not dependencies):
+if not dependencies:
     log += logError
 # print(log)
 
@@ -88,12 +88,12 @@ def pxRgnToTxt(layer):
     j = 1
     for v in values:
         text += str(v)
-        if (i < layer.bpp):
+        if i < layer.bpp:
             text += ','
             i += 1
         else:
             i = 1
-            if (j < (layer.width)):
+            if j < layer.width:
                 text += ';'
                 j += 1
             else:
@@ -131,7 +131,7 @@ def detailsNp(npArray):
     text = "matrix: " + str(height) + " x " + str(width)
     text += "\nvalues(min, max): " + min_value + ", " + max_value
 
-    if (npArray.ndim == 3):
+    if npArray.ndim == 3:
         # Valores máximos por canal
         max_r = str(np.amax(npArray[:, :, 0]))
         max_g = str(np.amax(npArray[:, :, 1]))
@@ -146,24 +146,18 @@ def detailsNp(npArray):
     return text
 
 
-def detailsPd(layer):
+def detailsPd(npArray):
     # Detalhes obtidos do Pandas
 
-    if (layer.bpp != 3):
-        # Somente imagens RGB
-        return
-
-    # Array
-    rgb_list = pxRgnToArray(layer)
     rgb = ['R', 'G', 'B']
-    h = layer.height
-    w = layer.width
+    height, width, channels = npArray.shape
 
     names = ['y', 'x', None]
-    index = pd.MultiIndex.from_product([range(h), range(w), rgb], names=names)
+    index = pd.MultiIndex.from_product([range(height), range(width), rgb],
+                                        names=names)
 
     # Data Frame
-    df = pd.Series(rgb_list, index=index)
+    df = pd.Series(npArray.flatten(), index=index)
     df = df.unstack()
     df = df.reset_index().reindex(columns=['x', 'y'] + rgb)
 
@@ -176,13 +170,13 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
     global log
 
     # Checar solicitações
-    if (not (saveSummary or saveDataNp or saveDataPd or saveDataTxt)):
+    if not (saveSummary or saveDataNp or saveDataPd or saveDataTxt):
         log += "nothing to do ...\n"
         print(log)
         return
 
     # Checar dependências
-    if (not dependencies):
+    if not dependencies:
         message(LABEL + ", error: missing dependencies ...")
         saveLog(log)
         return
@@ -195,42 +189,39 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
 
     try:
         img_copy = pxRgnToNumpy(layer)
-        log += layer.name + " to npArray ...\n"
+        log += layer.name + " to Numpy Array ...\n"
+
+        height, width, channels = img_copy.shape
+        if channels > 3:
+            img_copy = img_copy[:, :, :3]
+            log += layer.name + ", Numpy Array: RGBA => RGB ...\n"
 
         # Detalhes
-        summary = layer.name + '\n'
-        message(summary + "Check summary in " + filename + ".txt")
-
-        summary += now + '\n'
+        summary = layer.name + '\n' + now + '\n'
         summary += "\nNumpy:\n"
         summary += detailsNp(img_copy) + '\n'
 
         summary += "\nPandas:\n"
-        if (layer.bpp == 3):
-            # Implementar análise para RGBA
-            df = detailsPd(layer)
-            log += layer.name + " to Pandas Data Frame ...\n"
-            summary += df.describe().to_string() + '\n'
-        else:
-            summary += "Unanalyzed image.\n"
-            saveDataPd = False
+        df = detailsPd(img_copy)
+        log += layer.name + " to Pandas Data Frame ...\n"
+        summary += df.describe().to_string() + '\n'
 
         # Local para exportação de dados
         log += "local: " + directory + " ...\n"
 
-        if (saveSummary):
+        if saveSummary:
             # Salvar informações úteis
             log += layer.name + " ... export Summary ...\n"
             exportTxt(filename + "_summary_" + now + ".txt", summary)
 
-        if (saveDataNp):
+        if saveDataNp:
             # Salvar matriz Numpy
             log += layer.name + " ... export data: Numpy ...\n"
             pdb.gimp_progress_set_text("saving Numpy file ...")
             np.save(filename, img_copy)
             log += "saving Numpy file ...\n"
 
-        if (saveDataPd):
+        if saveDataPd:
             log += layer.name + " ... export data: Pandas ...\n"
             pdb.gimp_progress_set_text("saving Pandas files ...")
 
@@ -242,7 +233,7 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
             log += "saving Pandas Data Frame to CSV ...\n"
 
-        if (saveDataTxt):
+        if saveDataTxt:
             # Salvar matriz de pixels em Txt para uso em planilhas
             # Texto: R,G,B; ... ;R,G,B; ...
             start = datetime.datetime.now()
@@ -252,6 +243,8 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             end = datetime.datetime.now()
             log += layer.name + " ... export data: Txt ... "
             log += "time: " + str((end - start).seconds) + " seconds ...\n"
+
+        message("Check summary in " + filename + ".txt")
 
     except Exception as err:
         log += "[Error - Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'
