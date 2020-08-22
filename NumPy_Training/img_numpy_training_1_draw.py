@@ -31,9 +31,9 @@ class RGB:
 
         self.__rgb = self.__config(red, green, blue)
 
-    def setColor(self, rgb=None):
+    def setColor(self, rgb: 'list'=None):
 
-        if rgb is None:
+        if not isinstance(rgb, list):
             return
         if len(rgb) != 3:
             return
@@ -149,6 +149,12 @@ def test():
     c1.setColor(Color.RED)
     print(c1.getRGB())  # esperado [255, 0, 0]
 
+    print(c1.setColor.__annotations__)
+    c1.setColor()                 # ignorado
+    c1.setColor(10)               # ignorado
+    c1.setColor([0, 1, 2, 3, 4])  # ignorado
+    print(c1.getRGB())  # esperado [255, 0, 0]
+
     # Desenho
     height = 300
     width = 300
@@ -174,7 +180,7 @@ def test():
     a.view()
 
     print(a.getPixel(x*2, y*2))  # esperado [None, None, None]
-    print(a.getPixel(127, 0))    # esperado [0, 0, 255]
+    print(a.getPixel(x//2, 0))   # esperado [0, 0, 255]
 
     # Troca de background
     for i in range(0, height):
