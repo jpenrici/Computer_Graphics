@@ -5,7 +5,7 @@
     =========
 
     Example to view image details.
-    Use Numpy, Pandas.
+    Use Numpy, Pandas e Scipy.
 
     pdb.python_fu_viewDetails(img, drw ...)
 '''
@@ -54,6 +54,12 @@ except ImportError as err:
 try:
     import pandas as pd
     log += "pandas " + pd.__version__ + " ... ok\n"
+except ImportError as err:
+    logError += str(err) + " not found\n"
+    dependencies = False
+try:
+    from scipy import stats
+    log += "scipy stats ... ok\n"
 except ImportError as err:
     logError += str(err) + " not found\n"
     dependencies = False
@@ -148,7 +154,6 @@ def detailsNp(npArray):
 
 def detailsPd(npArray):
     # Detalhes obtidos do Pandas
-
     rgb = ['R', 'G', 'B']
     height, width, channels = npArray.shape
 
@@ -162,6 +167,21 @@ def detailsPd(npArray):
     df = df.reset_index().reindex(columns=['x', 'y'] + rgb)
 
     return df
+
+
+def detailsScipy(npArray):
+    # Detalhes obtidos do Stats
+    text = ""
+    colors = ["RED", "GREEN", "BLUE"]
+    for i in range(0, len(colors)):
+        # n elementos, mínimo e máximo, média, variância, obliquidade, curtose
+        nobs, minmax, mean, variance, skewness, kurtosis = stats.describe(
+                npArray[:, :, i].flatten())
+        temp = "[  {0}  ]\nnumber of elements: {1}\nmin: {2}\nmax: {3}\n" \
+            "mean: {4}\nvariance:: {5}\nskewness: {6}\nkurtosis: {7}\n"
+        text += temp.format(colors[i], nobs, minmax[0], minmax[1], mean,
+                            variance, skewness, kurtosis)
+    return text
 
 
 def viewDetails(img, layer, directory, saveSummary, saveDataNp,
@@ -205,6 +225,11 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
         df = detailsPd(img_copy)
         log += layer.name + " to Pandas Data Frame ...\n"
         summary += df.describe().to_string() + '\n'
+
+        summary += "\nScipy Stats:\n"
+        text = detailsScipy(img_copy)
+        summary += text + '\n'
+        log += layer.name + " to Scipy Stats ...\n"
 
         # Local para exportação de dados
         log += "local: " + directory + " ...\n"

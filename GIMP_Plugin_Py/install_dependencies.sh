@@ -27,6 +27,7 @@ if [ ! -d "$PYENV" ]; then
 	python -m pip install --upgrade pip
 	python -m pip install numpy
 	python -m pip install pandas
+	python -m pip install scipy
 	python -m pip install opencv-python==4.2.0.32
 	deactivate
 
