@@ -188,7 +188,7 @@ def test():
             if (a.getPixel(i, j) == Color.BLACK).all():
                 a.setPixel(i, j, [255, 127, 0])
 
-    a.export("./images/draw_1.png")  # esperado fundo colorido
+    a.export("../Images/draw_1.png")  # esperado fundo colorido
 
 
 if __name__ == '__main__':

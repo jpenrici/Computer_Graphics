@@ -3,7 +3,7 @@
 import numpy as np
 from scipy import stats
 
-PATH = "./images/"
+PATH = "../Images/"
 
 
 def test(filename):

@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-PATH = "./images/"
+PATH = "../Images/"
 
 
 def test(filename):

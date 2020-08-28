@@ -4,7 +4,7 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 
-PATH = "./images/"
+PATH = "../Images/"
 RED = 0
 GREEN = 1
 BLUE = 2

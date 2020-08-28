@@ -5,7 +5,7 @@
     =========
 
     Example to view image details.
-    Use Numpy, Pandas e Scipy.
+    Use Numpy, Pandas, Scipy...
 
     pdb.python_fu_viewDetails(img, drw ...)
 '''

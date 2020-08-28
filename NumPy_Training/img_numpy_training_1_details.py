@@ -4,7 +4,7 @@ import os
 import numpy as np
 from PIL import Image
 
-PATH = "./images/"
+PATH = "../Images/"
 RED = 0
 GREEN = 1
 BLUE = 2
