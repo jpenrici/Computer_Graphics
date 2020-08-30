@@ -127,44 +127,51 @@ def saveLog(text):
     exportTxt(filename, text)
 
 
+def imageType(channels):
+
+    if channels == 1:
+        return "Level (Gray)"
+    if channels == 3:
+        return "RGB"
+    if channels == 4:
+        return "RGBA"
+    return None
+
+
 def detailsNp(npArray):
     # Detalhes obtidos do Numpy
     text = ""
     height, width, channels = npArray.shape
     max_value = str(np.amax(npArray))
     min_value = str(np.amin(npArray))
+    imgType = imageType(channels)
 
-    text = "matrix: " + str(height) + " x " + str(width)
-    text += "\nvalues(min, max): " + min_value + ", " + max_value
+    text = "matrix: " + str(height) + " x " + str(width) + " " + imgType
+    text += "\nvalues(min, max): " + min_value + ", " + max_value + '\n'
 
-    if npArray.ndim == 3:
-        # Valores máximos por canal
-        max_r = str(np.amax(npArray[:, :, 0]))
-        max_g = str(np.amax(npArray[:, :, 1]))
-        max_b = str(np.amax(npArray[:, :, 2]))
-        text += "\nmax(R,G,B): " + max_r + ", " + max_g + ", " + max_b
-        # Valores mínimos por canal
-        min_r = str(np.amin(npArray[:, :, 0]))
-        min_g = str(np.amin(npArray[:, :, 1]))
-        min_b = str(np.amin(npArray[:, :, 2]))
-        text += "\nmix(R,G,B): " + min_r + ", " + min_g + ", " + min_b
+    for i in range(channels):
+        max_value = str(np.amax(npArray[:, :, i]))
+        min_value = str(np.amin(npArray[:, :, i]))
+        text += imgType[i] + "(min, max): " + min_value + ", " + max_value
+        text += '\n'
 
     return text
 
 
 def detailsPd(npArray):
     # Detalhes obtidos do Pandas
-    rgb = ['R', 'G', 'B']
     height, width, channels = npArray.shape
+    imgType = imageType(channels)
+    z = [imgType[i] for i in range(channels)]
 
     names = ['y', 'x', None]
-    index = pd.MultiIndex.from_product([range(height), range(width), rgb],
-                                        names=names)
+    index = pd.MultiIndex.from_product([range(height), range(width), z],
+                                       names=names)
 
     # Data Frame
     df = pd.Series(npArray.flatten(), index=index)
     df = df.unstack()
-    df = df.reset_index().reindex(columns=['x', 'y'] + rgb)
+    df = df.reset_index().reindex(columns=['x', 'y'] + z)
 
     return df
 
@@ -172,14 +179,16 @@ def detailsPd(npArray):
 def detailsScipy(npArray):
     # Detalhes obtidos do Stats
     text = ""
-    colors = ["RED", "GREEN", "BLUE"]
-    for i in range(0, len(colors)):
+    height, width, channels = npArray.shape
+    imgType = imageType(channels)
+    c = [imgType[i] for i in range(channels)]
+    for i in range(0, len(c)):
         # n elementos, mínimo e máximo, média, variância, obliquidade, curtose
         nobs, minmax, mean, variance, skewness, kurtosis = stats.describe(
                 npArray[:, :, i].flatten())
         temp = "[  {0}  ]\nnumber of elements: {1}\nmin: {2}\nmax: {3}\n" \
             "mean: {4}\nvariance:: {5}\nskewness: {6}\nkurtosis: {7}\n"
-        text += temp.format(colors[i], nobs, minmax[0], minmax[1], mean,
+        text += temp.format(c[i], nobs, minmax[0], minmax[1], mean,
                             variance, skewness, kurtosis)
     return text
 
@@ -208,13 +217,17 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
     filename = directory + "/" + (layer.name).replace('.', '_')  # export
 
     try:
+        # Converter Imagem em Numpy Array
         img_copy = pxRgnToNumpy(layer)
         log += layer.name + " to Numpy Array ...\n"
 
         height, width, channels = img_copy.shape
-        if channels > 3:
-            img_copy = img_copy[:, :, :3]
-            log += layer.name + ", Numpy Array: RGBA => RGB ...\n"
+        imgType = imageType(channels)
+
+        if imgType is None:
+            message("Plugin not prepared for this analysis!")
+            return
+        log += layer.name + ": " + imgType
 
         # Detalhes
         summary = layer.name + '\n' + now + '\n'
@@ -260,7 +273,7 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
 
         if saveDataTxt:
             # Salvar matriz de pixels em Txt para uso em planilhas
-            # Texto: R,G,B; ... ;R,G,B; ...
+            # Texto: Canal 1, Canal 2, Canal 3, Canal N; ...
             start = datetime.datetime.now()
             pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
             exportTxt(filename + ".txt", pxRgnToTxt(layer))
@@ -292,7 +305,7 @@ register(
     "GPL V2 License",      # licença
     "2020",                # data de criação (ano)
     N_(LABEL),             # rótulo do plugin no menu
-    "RGB*",                # tipos de imagens suportados
+    "RGB*, GRAY",          # tipos de imagens suportados
     [   # parâmetros de entrada do método
         (PF_IMAGE, "img", _("_Image"), None),
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
