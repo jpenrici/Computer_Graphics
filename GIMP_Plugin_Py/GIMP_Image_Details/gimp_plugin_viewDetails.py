@@ -131,10 +131,12 @@ def imageType(channels):
 
     if channels == 1:
         return "Level (Gray)"
+    if channels == 2:
+        return "LA (Gray, Alpha)"
     if channels == 3:
-        return "RGB"
+        return "RGB (Red, Green, Blue)"
     if channels == 4:
-        return "RGBA"
+        return "RGBA (Red, Green, Blue, Alpha)"
     return None
 
 
@@ -144,15 +146,15 @@ def detailsNp(npArray):
     height, width, channels = npArray.shape
     max_value = str(np.amax(npArray))
     min_value = str(np.amin(npArray))
-    imgType = imageType(channels)
+    img_type = imageType(channels)
 
-    text = "matrix: " + str(height) + " x " + str(width) + " " + imgType
+    text = "matrix: " + str(height) + " x " + str(width) + " " + img_type
     text += "\nvalues(min, max): " + min_value + ", " + max_value + '\n'
 
     for i in range(channels):
         max_value = str(np.amax(npArray[:, :, i]))
         min_value = str(np.amin(npArray[:, :, i]))
-        text += imgType[i] + "(min, max): " + min_value + ", " + max_value
+        text += img_type[i] + "(min, max): " + min_value + ", " + max_value
         text += '\n'
 
     return text
@@ -161,8 +163,8 @@ def detailsNp(npArray):
 def detailsPd(npArray):
     # Detalhes obtidos do Pandas
     height, width, channels = npArray.shape
-    imgType = imageType(channels)
-    z = [imgType[i] for i in range(channels)]
+    img_type = imageType(channels)
+    z = [img_type[i] for i in range(channels)]
 
     names = ['y', 'x', None]
     index = pd.MultiIndex.from_product([range(height), range(width), z],
@@ -180,8 +182,8 @@ def detailsScipy(npArray):
     # Detalhes obtidos do Stats
     text = ""
     height, width, channels = npArray.shape
-    imgType = imageType(channels)
-    c = [imgType[i] for i in range(channels)]
+    img_type = imageType(channels)
+    c = [img_type[i] for i in range(channels)]
     for i in range(0, len(c)):
         # n elementos, mínimo e máximo, média, variância, obliquidade, curtose
         nobs, minmax, mean, variance, skewness, kurtosis = stats.describe(
@@ -222,12 +224,12 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
         log += layer.name + " to Numpy Array ...\n"
 
         height, width, channels = img_copy.shape
-        imgType = imageType(channels)
+        img_type = imageType(channels)
 
-        if imgType is None:
+        if img_type is None:
             message("Plugin not prepared for this analysis!")
             return
-        log += layer.name + ": " + imgType
+        log += layer.name + ": " + img_type
 
         # Detalhes
         summary = layer.name + '\n' + now + '\n'
@@ -264,12 +266,15 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             pdb.gimp_progress_set_text("saving Pandas files ...")
 
             # Salvar no formato Python Pickle
+            pdb.gimp_progress_set_text("saving Python Pickle Format ...")
             df.to_pickle(filename + ".pkl")
             log += "saving Pandas Data Frame to Python Pickle Format ...\n"
 
             # Salvar no formato CSV
+            pdb.gimp_progress_set_text("saving Pandas Data Frame to CSV ...")
             df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
             log += "saving Pandas Data Frame to CSV ...\n"
+
 
         if saveDataTxt:
             # Salvar matriz de pixels em Txt para uso em planilhas
@@ -305,7 +310,7 @@ register(
     "GPL V2 License",      # licença
     "2020",                # data de criação (ano)
     N_(LABEL),             # rótulo do plugin no menu
-    "RGB*, GRAY",          # tipos de imagens suportados
+    "RGB*, GRAY*",         # tipos de imagens suportados
     [   # parâmetros de entrada do método
         (PF_IMAGE, "img", _("_Image"), None),
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
