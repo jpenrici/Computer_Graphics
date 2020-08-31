@@ -229,26 +229,29 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
         if img_type is None:
             message("Plugin not prepared for this analysis!")
             return
-        log += layer.name + ": " + img_type
+        log += layer.name + ": " + img_type + '\n'
 
-        # Detalhes
+        # Numpy -> Summary
         summary = layer.name + '\n' + now + '\n'
         summary += "\nNumpy:\n"
         summary += detailsNp(img_copy) + '\n'
 
-        summary += "\nPandas:\n"
+        # Pandas -> Summary
         df = detailsPd(img_copy)
-        log += layer.name + " to Pandas Data Frame ...\n"
+        summary += "\nPandas:\n"
         summary += df.describe().to_string() + '\n'
+        log += layer.name + "to Pandas Data Frame ...\n"
 
-        summary += "\nScipy Stats:\n"
+        # Scipy -> Summary
         text = detailsScipy(img_copy)
+        summary += "\nScipy Stats:\n"
         summary += text + '\n'
         log += layer.name + " to Scipy Stats ...\n"
 
         # Local para exportação de dados
         log += "local: " + directory + " ...\n"
 
+        # Exportar
         if saveSummary:
             # Salvar informações úteis
             log += layer.name + " ... export Summary ...\n"
@@ -262,27 +265,29 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             log += "saving Numpy file ...\n"
 
         if saveDataPd:
+            # Salvar dados do Pandas
             log += layer.name + " ... export data: Pandas ...\n"
             pdb.gimp_progress_set_text("saving Pandas files ...")
 
-            # Salvar no formato Python Pickle
+            # Formato Python Pickle
             pdb.gimp_progress_set_text("saving Python Pickle Format ...")
-            df.to_pickle(filename + ".pkl")
             log += "saving Pandas Data Frame to Python Pickle Format ...\n"
+            df.to_pickle(filename + ".pkl")
 
-            # Salvar no formato CSV
+            # Formato CSV
             pdb.gimp_progress_set_text("saving Pandas Data Frame to CSV ...")
-            df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
             log += "saving Pandas Data Frame to CSV ...\n"
-
+            df.to_csv(filename + ".csv", sep=';', encoding='utf-8')
 
         if saveDataTxt:
             # Salvar matriz de pixels em Txt para uso em planilhas
-            # Texto: Canal 1, Canal 2, Canal 3, Canal N; ...
-            start = datetime.datetime.now()
+            # Método lento, leitura pixel a pixel
+            # Saída: Canal 1, Canal 2, Canal 3, Canal N; ... (Texto)
             pdb.gimp_progress_set_text("converting matrix to text, please wait ...")
-            exportTxt(filename + ".txt", pxRgnToTxt(layer))
+            start = datetime.datetime.now()
+            data = pxRgnToTxt(layer)
             pdb.gimp_progress_set_text("saving TXT file ...")
+            exportTxt(filename + ".txt", data)
             end = datetime.datetime.now()
             log += layer.name + " ... export data: Txt ... "
             log += "time: " + str((end - start).seconds) + " seconds ...\n"
