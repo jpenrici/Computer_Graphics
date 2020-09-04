@@ -240,7 +240,7 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
         df = detailsPd(img_copy)
         summary += "\nPandas:\n"
         summary += df.describe().to_string() + '\n'
-        log += layer.name + "to Pandas Data Frame ...\n"
+        log += layer.name + " to Pandas Data Frame ...\n"
 
         # Scipy -> Summary
         text = detailsScipy(img_copy)
