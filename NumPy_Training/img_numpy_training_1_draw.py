@@ -57,11 +57,16 @@ class Color:
 
 class Img:
 
+    __channels = 3  # RGB
+
     def __init__(self, height, width, background=Color.BLACK):
 
         self.width = width
         self.height = height
-        self.rgbArray = np.array(background * height * width, dtype='uint8')
+        self.background = background
+
+        # Armazenamento em vetor
+        self.pixels = np.array(background * height * width, dtype='uint8')
 
     def __isValid(self, x, y):
 
@@ -72,7 +77,7 @@ class Img:
 
         return True
 
-    def setPixel(self, x, y, rgb=Color.WHITE):
+    def setPixel(self, x, y, color=Color.WHITE):
 
         x = int(x)
         y = int(y)
@@ -81,22 +86,30 @@ class Img:
             # Não desenhar fora dos limites
             return
 
-        pos = 3 * (x + y * self.width)
-        self.rgbArray[pos + 0] = rgb[0]  # Red
-        self.rgbArray[pos + 1] = rgb[1]  # Green
-        self.rgbArray[pos + 2] = rgb[2]  # Blue
+        pos = self.__channels * (x + y * self.width)
+        self.pixels[pos:pos+self.__channels] = color
 
     def getPixel(self, x, y):
 
         if (not self.__isValid(x, y)):
             return [None, None, None]
 
-        pos = 3 * (x + y * self.width)
-        pixel = self.rgbArray[pos:pos+3]
+        pos = self.__channels * (x + y * self.width)
+        pixel = self.pixels[pos:pos+self.__channels]
 
         return pixel
 
-    def line(self, x0, y0, x1, y1, rgb=Color.WHITE):
+    def setBackground(self, color=Color.WHITE):
+
+        # Troca de cores do fundo
+        stop = self.height * self.width * self.__channels
+        for pos in range(0, stop, self.__channels):
+            value = self.pixels[pos:pos+self.__channels]
+            if (value == self.background).all():
+                self.pixels[pos:pos+self.__channels] = color
+        self.background = color
+
+    def line(self, x0, y0, x1, y1, color=Color.WHITE):
 
         x = x1 - x0
         y = y1 - y0
@@ -105,9 +118,9 @@ class Img:
 
         d = int(sqrt(x**2 + y**2))
         for i in range(d):
-            self.setPixel(x0 + (i * step_x), y0 + (i * step_y), rgb)
+            self.setPixel(x0 + (i * step_x), y0 + (i * step_y), color)
 
-    def circle(self, x0, y0, radius=2, start=0, stop=360, rgb=Color.WHITE):
+    def circle(self, x0, y0, radius=2, start=0, stop=360, color=Color.WHITE):
 
         start = 0 if (start < 0 or start > 360) else start
         stop = 360 if (stop < 0 or stop > 360) else stop
@@ -115,18 +128,30 @@ class Img:
         for angle in range(start, stop):
             x = x0 + int(radius * sin(radians(angle)))
             y = y0 + int(radius * cos(radians(angle)))
-            self.setPixel(x, y, rgb)
+            self.setPixel(x, y, color)
 
-    def rectangle(self, x0, y0, height=2, width=2, rgb=Color.WHITE):
+    def rectangle(self, x0, y0, height=2, width=2, color=Color.WHITE,
+                  fill=False):
 
-        self.line(x0, y0, x0 + width, y0, rgb)
-        self.line(x0, y0, x0, y0 + height, rgb)
-        self.line(x0 + width, y0, x0 + width, y0 + height, rgb)
-        self.line(x0, y0 + height, x0 + width, y0 + height, rgb)
+        if (not fill):
+            self.line(x0, y0, x0 + width, y0, color)
+            self.line(x0, y0, x0, y0 + height, color)
+            self.line(x0 + width, y0, x0 + width, y0 + height, color)
+            self.line(x0, y0 + height, x0 + width, y0 + height, color)
+
+        if (fill):
+            if (not self.__isValid(x0, y0)):
+                return
+            if (not self.__isValid(x0 + width, y0 + height)):
+                return
+            # Preencher
+            for y in range(y0, y0 + height):
+                pos = self.__channels * (x0 + y * self.width)
+                self.pixels[pos:pos + self.__channels * width] = color * width
 
     def view(self):
 
-        output = self.rgbArray.reshape(self.height, self.width, 3)
+        output = self.pixels.reshape(self.height, self.width, self.__channels)
         # print(output)
 
         display = Image.fromarray(output, 'RGB')
@@ -134,7 +159,7 @@ class Img:
 
     def export(self, filename):
 
-        output = self.rgbArray.reshape(self.height, self.width, 3)
+        output = self.pixels.reshape(self.height, self.width, self.__channels)
         img = Image.fromarray(output, 'RGB')
         img.save(filename)
 
@@ -176,6 +201,7 @@ def test():
 
     a.rectangle(100, 100, 20, 20)
     a.rectangle(150, 150, 40, 40, Color.GREEN)
+    a.rectangle(220, 220, 50, 50, [255, 64, 32], fill=True)
 
     a.view()
 
@@ -183,10 +209,7 @@ def test():
     print(a.getPixel(x//2, 0))   # esperado [0, 0, 255]
 
     # Troca de background
-    for i in range(0, height):
-        for j in range(0, width):
-            if (a.getPixel(i, j) == Color.BLACK).all():
-                a.setPixel(i, j, [255, 127, 0])
+    a.setBackground([255, 127, 0])
 
     a.export("../Images/draw_1.png")  # esperado fundo colorido
 
