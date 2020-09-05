@@ -35,8 +35,8 @@ ENV = PATH + "/pyenv/lib/python2.7"
 HAAR_MODEL = "haarcascade_frontalface_default.xml"
 
 # Log
-now = datetime.datetime.now()
-log = "\nGIMP: " + str(now.strftime("%Y-%m-%d %H:%M:%S"))
+now = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+log = "\nGIMP: " + now
 log += "\nPlug-in: " + LABEL + '\n'
 logError = "Unexpected error: "
 
@@ -113,14 +113,30 @@ def lastLayer(img):
     return pos
 
 
-def saveLog(text):
-    filename = "LogGimpPlugin_" + str(now.strftime("%Y%m%d_%H%M%S")) + ".txt"
+def exportTxt(filename, text):
+    filename = filename.replace("-", "")
+    filename = filename.replace(":", "")
+    filename = filename.replace(" ", "_")
     try:
         filename = open(filename, "w")
         filename.write(text)
         filename.close()
     except Exception:
         pass
+
+
+def saveLog(text):
+    filename = "LogGimpPlugin_" + now + ".txt"
+    exportTxt(filename, text)
+
+
+def imageType(channels):
+
+    if channels == 3:
+        return "RGB (Red, Green, Blue)"
+    if channels == 4:
+        return "RGBA (Red, Green, Blue, Alpha)"
+    return None
 
 
 def faceDetection(img, layer, option):
@@ -141,11 +157,24 @@ def faceDetection(img, layer, option):
     log += "Face " + option + " ...\n"
 
     try:
-        # OpenCV
-        img_copy = pxRgnToNumpy(layer)  # RGB*
-        img_gray = cv.cvtColor(img_copy, cv.COLOR_RGB2GRAY)
-        log += layer.name + " to npArray ...\n"
+        # Converter Imagem em Numpy Array
+        img_copy = pxRgnToNumpy(layer)
+        log += layer.name + " to Numpy Array ...\n"
 
+        height, width, channels = img_copy.shape
+        img_type = imageType(channels)
+
+        if img_type is None:
+            message("Plugin not prepared for this analysis!")
+            return
+        log += layer.name + ": " + img_type + '\n'
+
+        # OpenCV
+        img_gray = cv.cvtColor(img_copy, cv.COLOR_RGB2GRAY)
+        log += layer.name + " to OpenCV ...\n"
+        log += "image RGB to GRAY ...\n"
+
+        # Detecção
         clf = cv.CascadeClassifier(cascade_path)
         faces = clf.detectMultiScale(img_gray, 1.3, 5)
 
@@ -154,13 +183,19 @@ def faceDetection(img, layer, option):
 
         if hits > 0 and option == "detection":
 
+            # Cor do retângulo
+            color = [0 for i in range(channels)]
+            if channels % 2 == 0:
+                color[-1] = 255  # alterar Alpha em [R,G,B,A]
+
+            # Marcar retângulo
             for (x, y, w, h) in faces:
                 img_copy = cv.rectangle(img_copy, (x, y), (x+w, y+h),
-                                        (0, 0, 0), 2)
+                                        tuple(color), 2)
 
             name = layer.name + " faces"
             createNewLayer(img, name, img_copy)
-            log += img.name + " create layer " + name + " ...\n"
+            log += img.name + ": create layer " + name + " ...\n"
 
             pdb.gimp_selection_none(img)
 

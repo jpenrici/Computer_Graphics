@@ -150,7 +150,7 @@ def colorsExperience(img, layer):
         log += layer.name + " to Array ...\n"
         pdb.gimp_progress_pulse()
 
-        # Prearar, remodelar Array
+        # Preparar, remodelar Array
         img_temp = [i for i in img_copy]    # copiar inteiros
         img_temp = [img_temp[i:i+channels] for i in range(0, height * width
                     * channels, channels)]  # separar pixels novamente
@@ -212,7 +212,7 @@ register(
         (PF_DRAWABLE, "drw", _("_Drawable"), None),
     ],
     [], # parâmetros de saída do método
-    colorsExperience,           # nome de chamada do método
+    colorsExperience,      # nome de chamada do método
     menu="<Image>/Image",  # caminho no menu
     domain=("gimp20-python", gimp.locale_directory)
     # on_query=None,
