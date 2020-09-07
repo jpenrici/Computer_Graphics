@@ -12,7 +12,7 @@ def organize(data):
     print("Original:")
     print(data[:2])
 
-    # Prearar, remodelar Array
+    # Preparar, remodelar Array
     height, width, channels = data.shape
     data = data.flatten()     # vetorizar
     temp = [i for i in data]  # lista
@@ -48,4 +48,12 @@ def test(filename):
 
 
 if __name__ == '__main__':
+
+    # Array
+    h, w, c = 5, 4, 3
+    numbers = [i for i in range(h*w*c, 0, -1)]
+    npArray = np.array(numbers).reshape(h, w, c)
+    organize(npArray)
+
+    # ndArray
     test("folha_croton")
