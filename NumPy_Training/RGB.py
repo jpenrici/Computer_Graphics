@@ -13,11 +13,24 @@ class RGB:
     __rgb = []
     __RED, __GREEN, __BLUE = 0, 1, 2
 
-    def __init__(self, red=255, green=255, blue=255):
+    def __init__(self, *rgb: 'only int,int,int and [int, int, int]'):
+
+        if len(rgb) == 1 and isinstance(rgb[0], list) and len(rgb[0]) == 3:
+            red, green, blue = rgb[0]
+        elif len(rgb) == 3:
+            red, green, blue = rgb[0], rgb[1], rgb[2]
+        else:
+            red, green, blue = 0, 0, 0
 
         self.__rgb = self.__config(red, green, blue)
 
+
     def __config(self, red, green, blue):
+
+        # Validar tipo
+        red = 0 if not isinstance(red, int) else red
+        green = 0 if not isinstance(green, int) else green
+        blue = 0 if not isinstance(blue, int) else blue
 
         # Limite inferior
         red = 0 if red < 0 else red
@@ -107,7 +120,6 @@ class RGB:
             num += value * 16 ** i
 
         return num
-
 
     def fromHex(self, text):
         '''
