@@ -20,4 +20,4 @@
 
 # Screenshot
 
-![screenshot](https://github.com/jpenrici/Computer_Graphics/blob/master/OpenCV_Cpp_Training/Threshold/images/display_image.png)
+![screenshot](https://github.com/jpenrici/Computer_Graphics/blob/master/OpenCV_Training/OpenCV_Cpp_Training/Threshold/images/display_image.png)
