@@ -50,4 +50,6 @@ def test(filename):
 
 
 if __name__ == '__main__':
+
+    # ndArray (Imagem)    
     test("folha_croton")

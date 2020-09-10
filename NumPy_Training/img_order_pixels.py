@@ -49,11 +49,11 @@ def test(filename):
 
 if __name__ == '__main__':
 
-    # Array
+    # ndArray
     h, w, c = 5, 4, 3
     numbers = [i for i in range(h*w*c, 0, -1)]
     npArray = np.array(numbers).reshape(h, w, c)
     organize(npArray)
 
-    # ndArray
+    # ndArray (Imagem)
     test("folha_croton")

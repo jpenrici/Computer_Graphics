@@ -8,12 +8,27 @@ from math import sqrt, sin, cos, radians
     Conjunto de métodos e classes para estudo e manipulação de imagens.
 '''
 
+
 class RGB:
 
     __rgb = []
     __RED, __GREEN, __BLUE = 0, 1, 2
 
-    def __init__(self, *rgb: 'only int,int,int and [int, int, int]'):
+    def __init__(self, *rgb):
+        '''
+            in:  int,int,int
+                 [int, int, int]
+                 #HexHexHex
+                 Int
+            out: [int, int, int]
+        '''
+        if len(rgb) == 1 and isinstance(rgb[0], str):
+            self.fromHex(rgb[0])
+            return
+
+        if len(rgb) == 1 and isinstance(rgb[0], int):
+            self.fromInt(rgb[0])
+            return
 
         if len(rgb) == 1 and isinstance(rgb[0], list) and len(rgb[0]) == 3:
             red, green, blue = rgb[0]
@@ -24,6 +39,11 @@ class RGB:
 
         self.__rgb = self.__config(red, green, blue)
 
+    def __str__(self):
+
+        text = "[{:3d}, {:3d}, {:3d}]".format(self.__rgb[0], self.__rgb[1],
+                 self.__rgb[2])
+        return text
 
     def __config(self, red, green, blue):
 
@@ -84,26 +104,26 @@ class RGB:
 
         return text
 
-    def toLong(self):
+    def toInt(self):
         '''
             in: [int]  rgb = [255, 255, 255]
             out: int   rgb = 16777215
         '''
-        num = self.__rgb[self.__RED] + self.__rgb[self.__GREEN] * 256
-        num += self.__rgb[self.__BLUE] * 256 * 256
+        num = self.__rgb[self.__RED] * 256 * 256
+        num += self.__rgb[self.__GREEN] * 256 + self.__rgb[self.__BLUE]
 
         return num
 
-    def fromLong(self, num):
+    def fromInt(self, num):
         '''
             in: int     rgb = 16777215
             out: [int]  rgb = [255, 255, 255]
         '''
-        blue = num // (256 * 256)
+        red = num // (256 * 256)
         num %= 256 * 256
         green = num // 256
         num %= 256
-        red = num
+        blue = num
 
         self.setRGB(red, green, blue)
 
