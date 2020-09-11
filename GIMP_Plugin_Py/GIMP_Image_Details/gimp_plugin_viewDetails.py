@@ -292,7 +292,10 @@ def viewDetails(img, layer, directory, saveSummary, saveDataNp,
             log += layer.name + " ... export data: Txt ... "
             log += "time: " + str((end - start).seconds) + " seconds ...\n"
 
-        message("Check summary in " + filename + ".txt")
+        if saveSummary:
+            message("Check summary in " + filename + ".txt")
+        else:
+            message("Finished.")
 
     except Exception as err:
         log += "[Error - Gimp Plugin: " + FILENAME + "]: " + str(err) + '\n'

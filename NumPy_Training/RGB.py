@@ -10,7 +10,6 @@ from math import sqrt, sin, cos, radians
 
 
 class RGB:
-
     __rgb = []
     __RED, __GREEN, __BLUE = 0, 1, 2
 
@@ -42,7 +41,7 @@ class RGB:
     def __str__(self):
 
         text = "[{:3d}, {:3d}, {:3d}]".format(self.__rgb[0], self.__rgb[1],
-                 self.__rgb[2])
+                                              self.__rgb[2])
         return text
 
     def __config(self, red, green, blue):
@@ -68,7 +67,7 @@ class RGB:
 
         self.__rgb = self.__config(red, green, blue)
 
-    def setColor(self, rgb: 'list'=None):
+    def setColor(self, rgb: 'list' = None):
 
         if not isinstance(rgb, list):
             return
@@ -133,9 +132,9 @@ class RGB:
         text = text[::-1].upper()
         for i in range(len(text)):
             value = ord(text[i])
-            if value >= ord('0') and value <= ord('9'):
+            if ord('0') <= value <= ord('9'):
                 value = value - ord('0')
-            if value >= ord('A') and value <= ord('F'):
+            if ord('A') <= value <= ord('F'):
                 value = value - ord('A') + 10
             num += value * 16 ** i
 
@@ -159,7 +158,6 @@ class RGB:
 
 
 class Color:
-
     # Cores pré definidas
     RED = [255, 0, 0]
     GREEN = [0, 255, 0]
@@ -169,7 +167,6 @@ class Color:
 
 
 class Img:
-
     __channels = 3  # RGB
 
     def __init__(self, height, width, background=Color.BLACK):
@@ -183,9 +180,9 @@ class Img:
 
     def __isValid(self, x, y):
 
-        if (x < 0 or x >= self.width):
+        if x < 0 or x >= self.width:
             return False
-        if (y < 0 or y >= self.height):
+        if y < 0 or y >= self.height:
             return False
 
         return True
@@ -195,20 +192,20 @@ class Img:
         x = int(x)
         y = int(y)
 
-        if (not self.__isValid(x, y)):
+        if not self.__isValid(x, y):
             # Não desenhar fora dos limites
             return
 
         pos = self.__channels * (x + y * self.width)
-        self.pixels[pos:pos+self.__channels] = color
+        self.pixels[pos:pos + self.__channels] = color
 
     def getPixel(self, x, y):
 
-        if (not self.__isValid(x, y)):
+        if not self.__isValid(x, y):
             return [None, None, None]
 
         pos = self.__channels * (x + y * self.width)
-        pixel = self.pixels[pos:pos+self.__channels]
+        pixel = self.pixels[pos:pos + self.__channels]
 
         return pixel
 
@@ -217,9 +214,9 @@ class Img:
         # Troca de cores do fundo
         stop = self.height * self.width * self.__channels
         for pos in range(0, stop, self.__channels):
-            value = self.pixels[pos:pos+self.__channels]
+            value = self.pixels[pos:pos + self.__channels]
             if (value == self.background).all():
-                self.pixels[pos:pos+self.__channels] = color
+                self.pixels[pos:pos + self.__channels] = color
         self.background = color
 
     def line(self, x0, y0, x1, y1, color=Color.WHITE):
@@ -229,7 +226,7 @@ class Img:
         step_x = -1 * (x < 0) + (x > 0)
         step_y = -1 * (y < 0) + (y > 0)
 
-        d = int(sqrt(x**2 + y**2))
+        d = int(sqrt(x ** 2 + y ** 2))
         for i in range(d):
             self.setPixel(x0 + (i * step_x), y0 + (i * step_y), color)
 
@@ -246,16 +243,16 @@ class Img:
     def rectangle(self, x0, y0, height=2, width=2, color=Color.WHITE,
                   fill=False):
 
-        if (not fill):
+        if not fill:
             self.line(x0, y0, x0 + width, y0, color)
             self.line(x0, y0, x0, y0 + height, color)
             self.line(x0 + width, y0, x0 + width, y0 + height, color)
             self.line(x0, y0 + height, x0 + width, y0 + height, color)
 
-        if (fill):
-            if (not self.__isValid(x0, y0)):
+        if fill:
+            if not self.__isValid(x0, y0):
                 return
-            if (not self.__isValid(x0 + width, y0 + height)):
+            if not self.__isValid(x0 + width, y0 + height):
                 return
             # Preencher
             for y in range(y0, y0 + height):

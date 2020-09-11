@@ -41,7 +41,7 @@ def test(filename):
     data = np.load(img_np)
 
     h, w, c = data.shape
-    if (c > 3):
+    if c > 3:
         data = data[:, :, :3]
 
     view(data, RED, GREEN)

@@ -20,13 +20,13 @@ def view(data, channel=ALL, title="histogram"):
     bins = np.arange(0, 256)
     kwargs = dict(histtype='step', bins=bins)
 
-    if (channel == RED or channel == ALL):
+    if channel == RED or channel == ALL:
         plt.hist(R, color='r', label="RED", **kwargs)
 
-    if (channel == GREEN or channel == ALL):
+    if channel == GREEN or channel == ALL:
         plt.hist(G, color='g', label="GREEN", **kwargs)
 
-    if (channel == BLUE or channel == ALL):
+    if channel == BLUE or channel == ALL:
         plt.hist(B, color='b', label="BLUE", **kwargs)
 
     plt.title(title)
@@ -48,7 +48,7 @@ def test(filename):
     data = np.load(img_np)
 
     h, w, c = data.shape
-    if (c > 3):
+    if c > 3:
         data = data[:, :, :3]
 
     view(data, RED)
