@@ -8,11 +8,11 @@ PATH = "../Images/"
 RED = 0
 GREEN = 1
 BLUE = 2
+separator = 10 * '-'
 
 
 def details(data):
 
-    separator = 10 * '-'
     print(separator)
 
     height, width, channels = data.shape
@@ -73,3 +73,5 @@ if __name__ == '__main__':
 
     # ndArray (Imagem)
     test("folha_croton")
+    print(separator)
+    test("cafeeiro_campo")

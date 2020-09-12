@@ -28,18 +28,21 @@ PATH = "../Images/"
 def calc(data):
 
     # Índice de folha verde
-    ifv = lambda R,G,B: (2 * G - R - B) / (2 * G + R + B)
+    # ifv = lambda R,G,B: (2 * G - R - B) / (2 * G + R + B)
+    def ifv(R, G, B):
+        return (2 * G - R - B) / (2 * G + R + B)
 
     # Formatar
     h, w, c = data.shape
     v = data.flatten()
 
     # Calcular
-    ifv_values = [ifv(v[i], v[i + 1], v[i + 2]) for i in range(0, h * w * c, c)]
-    points = [int(255 * i) if i > 0 else 0 for i in ifv_values]
+    ifv_list = [ifv(v[i], v[i + 1], v[i + 2]) for i in range(0, h * w * c, c)]
+    points = [int(255 * i) if i > 0 else 0 for i in ifv_list]
 
     # Reformatar
     npArray = np.array(points).reshape(h, w)  # Tons de Cinza
+    npArray = np.uint8(npArray)
 
     return npArray
 
@@ -72,6 +75,7 @@ def test(filename):
 
     result = calc(data)
     view(result)
+    saveImg(filename + "_ifv.png", result)
 
 
 if __name__ == '__main__':
@@ -86,3 +90,4 @@ if __name__ == '__main__':
 
     # ndArray (Imagem)
     test("folha_cafeeiro_doente")
+    test("cheflera_variegata")

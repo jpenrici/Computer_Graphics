@@ -78,3 +78,4 @@ if __name__ == '__main__':
 
     # ndArray (Imagem)
     test("folha_cafeeiro_doente", 5)
+    test("cafeeiro_campo", 10)
