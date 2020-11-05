@@ -32,4 +32,4 @@ Referências
 Licença
 =======
 
-Esta fonte é modificada e liberada sob os termos da licença de código aberto GPLv2. Vejo `LICENSE` para detalhes. <br>
+Veja `LICENSE` para detalhes. <br>

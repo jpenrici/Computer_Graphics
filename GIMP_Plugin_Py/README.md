@@ -34,4 +34,4 @@ References
 License
 =======
 
-This source is modified and released under the terms of the GPLv2 open source license. I see `LICENSE` for details. <br>
+See `LICENSE` for details. <br>
