@@ -1,14 +1,19 @@
+#ifndef __Draw_H__
+#define __Draw_H__
+
 #include "Geometry.h"
 
 #include <GL/gl.h>
 #include <GL/glut.h>
 
 #include <vector>
+#include <string>
+#include <fstream>
 
 using namespace std;
 
-#define SCREEN_WIDTH  500
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH  500.0
+#define SCREEN_HEIGHT 500.0
 #define LIMIT_X       SCREEN_WIDTH  * 0.45
 #define LIMIT_Y       SCREEN_HEIGHT * 0.45
 #define ORIGIN_X      SCREEN_WIDTH  * 0.50
@@ -25,6 +30,9 @@ void display(void);
 void keyboard(unsigned char key, int x, int y);
 Vertice adjust(Vertice vertice);
 Vertices adjust(Vertices vertices);
+bool load(string filename);
+bool save(string filename);
+bool save_csv(string filename);
 
 int draw(int argc, char** argv)
 {
@@ -102,8 +110,85 @@ Vertice adjust(Vertice vertice)
 Vertices adjust(Vertices vertices)
 {
     Vertices temp;
-    for (auto v : vertices)
-        temp.push_back(adjust(v));
+    for (auto vertice : vertices)
+        temp.push_back(adjust(vertice));
     
     return temp;
 }
+
+bool load(string filename)
+{
+    ifstream fileIn(filename, ios::in | ios::binary);
+    
+    if(!fileIn)
+    { 
+        cerr << "I/O error.\n";
+        return false;
+    }
+    
+    Vertice vertice;
+    vertices.clear();
+
+    fileIn.seekg(0);
+    while (fileIn && !fileIn.eof())
+    {   
+        fileIn.read((char *)(&vertice), sizeof(Vertice));
+        if (!fileIn.eof())
+            vertices.push_back(vertice);
+    }
+
+    fileIn.clear();
+    fileIn.close(); 
+
+    return true;
+}
+
+bool save(string filename)
+{
+    string extension = "";
+    if (filename.size() > 4)
+        extension = filename.substr(filename.size() - 4, 4);
+
+    if (extension == ".txt")
+    {
+        ofstream fileOut(filename);
+
+        if(!fileOut)
+        { 
+            cerr << "I/O error.\n";
+            return false;
+        }       
+
+        for (auto vertice: vertices)
+            fileOut << vertice.csv() << '\n';
+
+        fileOut.clear();
+        fileOut.close();
+
+        return true;        
+    }
+
+    if (extension == ".dat")
+    {
+        ofstream fileOut(filename, ios::out | ios::binary);
+
+        if(!fileOut)
+        { 
+            cerr << "I/O error.\n";
+            return false;
+        }
+
+        fileOut.seekp(0);
+        for (auto vertice : vertices)
+            fileOut.write((const char *)(&vertice), sizeof(Vertice));
+
+        fileOut.clear();
+        fileOut.close();
+
+        return true;
+    }
+
+    return false;
+}
+
+#endif // __Draw_H__
