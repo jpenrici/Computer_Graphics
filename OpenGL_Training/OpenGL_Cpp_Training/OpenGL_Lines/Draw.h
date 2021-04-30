@@ -32,7 +32,6 @@ Vertice adjust(Vertice vertice);
 Vertices adjust(Vertices vertices);
 bool load(string filename);
 bool save(string filename);
-bool save_csv(string filename);
 
 int draw(int argc, char** argv)
 {
