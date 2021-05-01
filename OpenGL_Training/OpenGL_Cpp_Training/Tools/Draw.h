@@ -130,7 +130,7 @@ void specialKeys(int key, int x, int y)
 Vertice adjust(Vertice vertice)
 {
     vertice.normalize();
-    vertice *= Vertice(LIMIT_X, LIMIT_Y, 0);
+    vertice = Vertice(vertice.getX() * LIMIT_X, vertice.getY() * LIMIT_Y, 0);
     
     return Vertice(ORIGIN_X + vertice.getX(), ORIGIN_Y - vertice.getY(), 0);
 }

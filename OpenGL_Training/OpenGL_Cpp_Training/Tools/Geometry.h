@@ -94,15 +94,6 @@ public:
         return *this;
     }
 
-    Vector3D& operator*=(const Vector3D& v2)
-    {
-        X *= v2.X;
-        Y *= v2.Y;
-        Z *= v2.Z;
-        
-        return *this;
-    }    
-    
     Vector3D operator/(float scalar)
     {
         return Vector3D(X / scalar, Y / scalar, Z / scalar);
@@ -128,7 +119,7 @@ public:
 
     string str()
     {
-        return "(" + to_string(X) + ", " + to_string(Y) + ", " + to_string(Z) + ")";
+        return "(" + csv() + ")";
     }
 
     string csv()
