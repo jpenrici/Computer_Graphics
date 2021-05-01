@@ -1,3 +1,10 @@
+/*
+ *   Compile:
+ *      g++ Draw_star.cpp -o Test_Draw -lGLU -lGL -lglut -I../Tools/
+ *
+ *   Run:
+ *      ./Test_Draw
+*/
 #include "Draw.h"
 
 int main(int argc, char **argv)
