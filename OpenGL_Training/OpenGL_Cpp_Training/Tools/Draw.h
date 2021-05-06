@@ -28,13 +28,15 @@ void init(void);
 void display(void);
 void reshape(int width, int height);
 void idle(void);
+
 void specialKeys(int key, int x, int y);
 void keyboard(unsigned char key, int x, int y);
 void (*key_pressed)(int key);   // Function Pointer
+
 bool load(string filename);
 bool save(string filename);
-Vertice adjust(Vertice vertice);
-Vertices adjust(Vertices vertices);
+
+void circle(Vertice center, float radius, float angle0, float angle1);
 
 /* FUNCTIONS */
 
@@ -167,6 +169,12 @@ bool load(string filename)
 
 bool save(string filename)
 {
+    if (vertices.empty())
+    {
+        cout << "Vertices list empty. Nothing to do.\n";
+        return false;
+    }
+
     string extension = "";
     if (filename.size() > 4)
         extension = filename.substr(filename.size() - 4, 4);
@@ -221,6 +229,13 @@ bool save(string filename)
     }
 
     return false;
+}
+
+void circle(Vertice center, float radius, float angle0, float angle1)
+{
+    vertices.clear();
+    for (int angle = angle0; angle <= angle1; angle++)
+        vertices.push_back(center.polar(radius, angle));
 }
 
 #endif // __Draw_H__

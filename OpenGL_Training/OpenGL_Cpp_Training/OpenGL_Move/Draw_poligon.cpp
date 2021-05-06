@@ -13,8 +13,8 @@ void poligon(float radius, int number)
     for (int i = 0; i < number; ++i)
     {
         vertices.push_back(Vertice(
-            ORIGIN_X + radius * cos(Radians(i * (360 / number))),
-            ORIGIN_Y + radius * sin(Radians(i * (360 / number))),
+            radius * cos(Radians(i * (360 / number))),
+            radius * sin(Radians(i * (360 / number))),
             0 ));        
     }
     vertices.push_back(vertices[0]);
@@ -30,11 +30,11 @@ void move(int key_pressed)
     {
         case 101:
             x =  0;
-            y = -y;
             key = "GLUT_KEY_UP";        
             break;
         case 103:
             x =  0;
+            y = -y;            
             key = "GLUT_KEY_DOWN";
             break;
         case 100:

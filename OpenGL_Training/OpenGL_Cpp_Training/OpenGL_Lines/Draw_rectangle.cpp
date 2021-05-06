@@ -20,7 +20,7 @@ void change(int key_pressed)
         Rectangle(Point( 75,  10), 50, 50), // case 2
         Rectangle(Point(125,  75), 50, 50), // case 3
         Rectangle(Point( 10,  75), 50, 50), // case 4
-        Rectangle(Point( 10,  15), 50, 50), // case 5   
+        Rectangle(Point( 10,  15), 50, 50), // case 5
         Rectangle(Point( 10, 135), 50, 50), // case 6
         Rectangle(Point(125, 135), 50, 50), // case 7
         Rectangle(Point(125,  15), 50, 50), // case 8
