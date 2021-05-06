@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv)
 {
-    Vertice center = adjust(Vertice(0, 0, 0));
+    Vertice center = Vertice(0, 0);
 
     int number = 24;
     float radius_1 = 200;
@@ -27,4 +27,4 @@ int main(int argc, char **argv)
     draw(argc, argv);
 
     return 0;
-} 
+}

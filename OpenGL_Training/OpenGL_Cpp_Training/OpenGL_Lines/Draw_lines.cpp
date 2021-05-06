@@ -9,13 +9,13 @@
 
 int main(int argc, char **argv)
 {
-    vertices = adjust({
-        Vertice(-5000, -5000, 0),
-        Vertice( 5000, -5000, 0),
-        Vertice(    0,  5000, 0),
-        Vertice( 2500,  2500, 0),
-        Vertice(    0,     0, 0)
-    });
+    vertices = {
+        Vertice(-50, -50, 0),
+        Vertice( 50, -50, 0),
+        Vertice(  0,  50, 0),
+        Vertice( 25,  25, 0),
+        Vertice(  0,   0, 0)
+    };
 
     string name = "Draw_lines_vertices";
 

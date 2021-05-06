@@ -9,12 +9,12 @@
 
 int main(int argc, char **argv)
 {
-    vertices = adjust({
-        Vertice(-1000, -1000, 0),
-        Vertice( 1000, -1000, 0),
-        Vertice(    0,  1000, 0),
-        Vertice(-1000, -1000, 0)
-    });
+    vertices = {
+        Vertice(-100, -100, 0),
+        Vertice( 100, -100, 0),
+        Vertice(   0,  100, 0),
+        Vertice(-100, -100, 0)
+    };
 
     draw(argc, argv);
 

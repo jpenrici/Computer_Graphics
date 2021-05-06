@@ -9,7 +9,7 @@
 
 int main(int argc, char **argv)
 {
-    Vertice center = adjust(Vertice(0, 0, 0));
+    Vertice center = Vertice(0, 0);
 
     int num = 7;
     float radius = 0;
