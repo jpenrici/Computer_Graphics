@@ -14,8 +14,6 @@ using namespace std;
 
 #define SCREEN_WIDTH  500.0
 #define SCREEN_HEIGHT 500.0
-#define LIMIT_X       SCREEN_WIDTH  * 0.45
-#define LIMIT_Y       SCREEN_HEIGHT * 0.45
 #define ORIGIN_X      SCREEN_WIDTH  * 0.50
 #define ORIGIN_Y      SCREEN_HEIGHT * 0.50
 #define ORIGIN_Z      0.0
@@ -92,7 +90,18 @@ void display(void)
         glColor3f(0.0, 0.0, 0.0);
         glBegin(GL_LINE_STRIP);
             for (auto v : vertices)
-                glVertex3f(v.getX(), v.getY(), v.getZ());
+            {
+                float x = ORIGIN_X + v.getX();
+                float y = ORIGIN_Y - v.getY();
+
+                if (x < 0) x = 0;
+                if (x > SCREEN_WIDTH) x = SCREEN_WIDTH;
+
+                if (y < 0) y = 0;
+                if (y > SCREEN_HEIGHT) y = SCREEN_HEIGHT;
+                
+                glVertex3f(x, y, v.getZ());
+            }
         glEnd();
     }
 
@@ -127,23 +136,6 @@ void specialKeys(int key, int x, int y)
         cout << "No action. Nothing to do.\n";
 }
 
-Vertice adjust(Vertice vertice)
-{
-    vertice.normalize();
-    vertice = Vertice(vertice.getX() * LIMIT_X, vertice.getY() * LIMIT_Y, 0);
-    
-    return Vertice(ORIGIN_X + vertice.getX(), ORIGIN_Y - vertice.getY(), 0);
-}
-
-Vertices adjust(Vertices vertices)
-{
-    Vertices temp;
-    for (auto vertice : vertices)
-        temp.push_back(adjust(vertice));
-    
-    return temp;
-}
-
 bool load(string filename)
 {
     ifstream fileIn(filename, ios::in | ios::binary);
@@ -153,16 +145,18 @@ bool load(string filename)
         cerr << "I/O error.\n";
         return false;
     }
-    
-    Vertice vertice;
+
+    float x, y, z;
     vertices.clear();
 
     fileIn.seekg(0);
     while (fileIn && !fileIn.eof())
     {   
-        fileIn.read((char *)(&vertice), sizeof(Vertice));
+        fileIn.read((char *)(&x), sizeof(float));
+        fileIn.read((char *)(&y), sizeof(float));
+        fileIn.read((char *)(&z), sizeof(float));        
         if (!fileIn.eof())
-            vertices.push_back(vertice);
+            vertices.push_back(Vertice(x, y, z));
     }
 
     fileIn.clear();
@@ -206,9 +200,19 @@ bool save(string filename)
             return false;
         }
 
+        float value;
         fileOut.seekp(0);
         for (auto vertice : vertices)
-            fileOut.write((const char *)(&vertice), sizeof(Vertice));
+        {
+            value = vertice.getX();
+            fileOut.write((const char *)(&value), sizeof(float));
+
+            value = vertice.getY();
+            fileOut.write((const char *)(&value), sizeof(float));            
+           
+            value = vertice.getZ();
+            fileOut.write((const char *)(&value), sizeof(float));
+        }
 
         fileOut.clear();
         fileOut.close();
