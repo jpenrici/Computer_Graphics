@@ -32,7 +32,9 @@ void idle(void);
 
 void specialKeys(int key, int x, int y);
 void keyboard(unsigned char key, int x, int y);
-void (*key_pressed)(int key);   // Function Pointer
+void mouseEvent(int button, int state, int x, int y);
+void (*key_pressed)(int key);               // Function Pointer - KeyboardFunc
+void (*mouse_event)(int button, int state); // Function Pointer - MouseFunc
 
 void make(Vertices vertices);
 bool load(string filename);
@@ -52,7 +54,8 @@ int draw(int argc, char** argv)
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
-    glutSpecialFunc(specialKeys);   
+    glutSpecialFunc(specialKeys);
+    glutMouseFunc(mouseEvent);  
     glutIdleFunc(idle);
 
     glutMainLoop();
@@ -125,7 +128,15 @@ void specialKeys(int key, int x, int y)
     if (key_pressed != NULL)
         key_pressed(key);
     else
-        cout << "No action. Nothing to do.\n";
+        cout << "special keys : No action. Nothing to do.\n";
+}
+
+void mouseEvent(int button, int state, int x, int y)
+{
+    if (mouse_event != NULL)
+        mouse_event(button, state);
+    else
+        cout << "mouse : No action. Nothing to do.\n";    
 }
 
 bool load(string filename)
