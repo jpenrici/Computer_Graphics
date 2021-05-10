@@ -6,6 +6,7 @@
  *      ./Test_Draw
 */
 #include "Draw.h"
+#include "Line.h"
 
 void poligon(float radius, int number)
 {
@@ -18,6 +19,7 @@ void poligon(float radius, int number)
             0 ));        
     }
     vertices.push_back(vertices[0]);
+    vertices = Lines(vertices).points();
 }
 
 void move(int key_pressed)

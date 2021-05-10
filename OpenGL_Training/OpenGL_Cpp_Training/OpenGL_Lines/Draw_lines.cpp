@@ -6,6 +6,7 @@
  *      ./Test_Draw
 */
 #include "Draw.h"
+#include "Line.h"
 
 int main(int argc, char **argv)
 {
@@ -23,6 +24,11 @@ int main(int argc, char **argv)
     save(name + ".dat");
 
     load(name + ".dat");
+
+    figures.clear();
+    for (int i = 0; i < vertices.size() - 1; ++i)
+        figures.push_back(Lines(vertices).points());
+    
     draw(argc, argv);    
 
     return 0;

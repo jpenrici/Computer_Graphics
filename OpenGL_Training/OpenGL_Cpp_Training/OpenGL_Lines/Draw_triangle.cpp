@@ -5,16 +5,13 @@
  *   Run:
  *      ./Test_Draw
 */
+
 #include "Draw.h"
+#include "Triangle.h"
 
 int main(int argc, char **argv)
 {
-    vertices = {
-        Vertice(-100, -100, 0),
-        Vertice( 100, -100, 0),
-        Vertice(   0,  100, 0),
-        Vertice(-100, -100, 0)
-    };
+    vertices = Triangle(Vertice(-50, 0), 100, 100).poligon();
 
     draw(argc, argv);
 

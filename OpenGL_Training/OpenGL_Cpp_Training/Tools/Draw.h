@@ -22,6 +22,7 @@ typedef Vector3D         Vertice;
 typedef vector<Vector3D> Vertices;
 
 Vertices vertices;
+vector <Vertices> figures; 
 const Vertice ORIGIN(ORIGIN_X, ORIGIN_Y, ORIGIN_Z);
 
 void init(void);
@@ -33,10 +34,9 @@ void specialKeys(int key, int x, int y);
 void keyboard(unsigned char key, int x, int y);
 void (*key_pressed)(int key);   // Function Pointer
 
+void make(Vertices vertices);
 bool load(string filename);
 bool save(string filename);
-
-void circle(Vertice center, float radius, float angle0, float angle1);
 
 /* FUNCTIONS */
 
@@ -87,24 +87,14 @@ void display(void)
     glEnd();
 
     // Draw
-    if (!vertices.empty())
+    if (!figures.empty())
     {
-        glColor3f(0.0, 0.0, 0.0);
-        glBegin(GL_LINE_STRIP);
-            for (auto v : vertices)
-            {
-                float x = ORIGIN_X + v.getX();
-                float y = ORIGIN_Y - v.getY();
-
-                if (x < 0) x = 0;
-                if (x > SCREEN_WIDTH) x = SCREEN_WIDTH;
-
-                if (y < 0) y = 0;
-                if (y > SCREEN_HEIGHT) y = SCREEN_HEIGHT;
-                
-                glVertex3f(x, y, v.getZ());
-            }
-        glEnd();
+        for (auto figure : figures)
+            make(figure);
+    }
+    else
+    {
+        make(vertices);
     }
 
     glFlush();
@@ -231,11 +221,27 @@ bool save(string filename)
     return false;
 }
 
-void circle(Vertice center, float radius, float angle0, float angle1)
+void make(Vertices vertices)
 {
-    vertices.clear();
-    for (int angle = angle0; angle <= angle1; angle++)
-        vertices.push_back(center.polar(radius, angle));
+    if (!vertices.empty())
+    {
+        glColor3f(0.0, 0.0, 0.0);
+        glBegin(GL_POINTS);
+        for (auto v : vertices)
+        {
+            float x = ORIGIN_X + v.getX();
+            float y = ORIGIN_Y - v.getY();
+
+            if (x < 0) x = 0;
+            if (x > SCREEN_WIDTH) x = SCREEN_WIDTH;
+
+            if (y < 0) y = 0;
+            if (y > SCREEN_HEIGHT) y = SCREEN_HEIGHT;
+            
+            glVertex3f(x, y, v.getZ());
+        }
+        glEnd();
+    }
 }
 
 #endif // __Draw_H__

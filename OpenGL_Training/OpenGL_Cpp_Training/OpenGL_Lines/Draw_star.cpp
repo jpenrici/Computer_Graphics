@@ -6,6 +6,7 @@
  *      ./Test_Draw
 */
 #include "Draw.h"
+#include "Line.h"
 
 int main(int argc, char **argv)
 {
@@ -23,6 +24,7 @@ int main(int argc, char **argv)
             vertices.push_back(center.polar(radius_2, i * 360 / number));
     }
     vertices.push_back(vertices[0]);
+    vertices = Lines(vertices).points();
 
     draw(argc, argv);
 

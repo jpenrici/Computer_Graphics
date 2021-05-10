@@ -30,14 +30,12 @@ void change(int key_pressed)
     cout << "case " << i << '\n';
 
     vertices = r1.join(rectangles[i]);
-    if (!vertices.empty())
-        vertices.push_back(vertices.front());
 }
 
 int main(int argc, char **argv)
 {
     // Rectangle
-    vertices = r1.points();
+    vertices = r1.poligon();
     vertices.push_back(vertices.front());
 
     // Set function pointer

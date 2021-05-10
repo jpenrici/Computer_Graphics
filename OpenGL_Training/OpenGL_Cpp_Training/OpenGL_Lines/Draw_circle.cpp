@@ -26,11 +26,14 @@ void change(int key_pressed)
     };
 
     int i = index++ % circles.size();
-    circle(circles[i].center(), circles[i].radius(), 0, 360);
+    vertices = circles[i].points();   
 }
 
 int main(int argc, char **argv)
 {
+    // Circles
+    vertices = c1.points();
+
     // Set function pointer
     key_pressed = &change;
 
