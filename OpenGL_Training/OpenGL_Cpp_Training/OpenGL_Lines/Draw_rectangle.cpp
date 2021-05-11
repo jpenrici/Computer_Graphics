@@ -35,7 +35,7 @@ void change(int key_pressed)
 int main(int argc, char **argv)
 {
     // Rectangle
-    vertices = r1.poligon();
+    vertices = r1.polygon();
     vertices.push_back(vertices.front());
 
     // Set function pointer

@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv)
 {
-    vertices = Triangle(Vertice(-50, 0), 100, 100).poligon();
+    vertices = Triangle(Vertice(-50, 0), 100, 100).polygon();
 
     draw(argc, argv);
 
