@@ -1,6 +1,7 @@
 #!/bin/bash
 
-filenames=("Draw_lines_3D.cpp")
+filenames=("Draw_circles_3D.cpp" "Draw_lines_3D.cpp" "Draw_points_3D.cpp" \
+	"Draw_sphere_3D.cpp")
 
 echo "Test all ..."
 for item in "${filenames[@]}"; do

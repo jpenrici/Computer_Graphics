@@ -100,14 +100,14 @@ void display(void)
     // Y axis
     glColor3f(1.0, 0.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f(ORIGIN_X,  0.0, ORIGIN_Z);
+        glVertex3f(ORIGIN_X, 0.0, ORIGIN_Z);
         glVertex3f(ORIGIN_X, SCREEN_HEIGHT, ORIGIN_Z);
     glEnd();    
 
     // X axis
     glColor3f(0.0, 1.0, 0.0);
     glBegin(GL_LINES);
-        glVertex3f( 0.0, ORIGIN_Y, ORIGIN_Z);
+        glVertex3f(0.0, ORIGIN_Y, ORIGIN_Z);
         glVertex3f(SCREEN_WIDTH, ORIGIN_Y, ORIGIN_Z);
     glEnd();
 
@@ -228,7 +228,7 @@ bool load(string filename)
     {   
         fileIn.read((char *)(&x), sizeof(float));
         fileIn.read((char *)(&y), sizeof(float));
-        fileIn.read((char *)(&z), sizeof(float));        
+        fileIn.read((char *)(&z), sizeof(float));
         if (!fileIn.eof())
             vertices.push_back(Vertice(x, y, z));
     }

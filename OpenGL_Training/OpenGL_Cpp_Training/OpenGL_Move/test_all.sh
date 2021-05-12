@@ -10,4 +10,3 @@ for item in "${filenames[@]}"; do
 	./Test_Draw
 done
 echo "Finished"
-

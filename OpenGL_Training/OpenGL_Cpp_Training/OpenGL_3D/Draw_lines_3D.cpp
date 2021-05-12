@@ -23,12 +23,13 @@ int main(int argc, char **argv)
 
     };
 
+    // Draw
     figures.clear();
     for (int i = 0; i < vertices.size() - 1; ++i)
         figures.push_back(Lines(vertices).points());
     
     // OpenGL
-    draw(argc, argv);   
+    draw(argc, argv);
 
     return 0;
 }

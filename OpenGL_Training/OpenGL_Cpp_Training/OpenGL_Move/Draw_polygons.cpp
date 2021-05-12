@@ -35,11 +35,11 @@ void move(int key_pressed)
     {
         case 101:
             x =  0;
-            key = "GLUT_KEY_UP";        
+            key = "GLUT_KEY_UP";
             break;
         case 103:
             x =  0;
-            y = -y;            
+            y = -y;
             key = "GLUT_KEY_DOWN";
             break;
         case 100:
@@ -50,7 +50,7 @@ void move(int key_pressed)
         case 102:
             y = 0;
             key = "GLUT_KEY_RIGHT";
-            break;                                    
+            break;
         default:
             x = y = 0; 
     }

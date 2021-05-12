@@ -80,6 +80,11 @@ public:
 
     Points points()
     {
+        return points(1.0);
+    }
+
+    Points points(float step)    
+    {
         if (m_points.empty())
             return {/* Empty */};
 
