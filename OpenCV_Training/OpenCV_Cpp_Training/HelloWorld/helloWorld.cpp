@@ -25,5 +25,6 @@ int main()
     // Computer_Graphics/Images
     const char *path = "../../../Images/openclipart_tree-17.png";
     displayImage(path);
+
     return 0;
 }

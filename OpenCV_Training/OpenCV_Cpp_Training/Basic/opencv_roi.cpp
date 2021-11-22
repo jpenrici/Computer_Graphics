@@ -3,7 +3,6 @@
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
-using std::cin;
 using std::cout;
 
 int main(int argc, char **argv)
@@ -13,8 +12,8 @@ int main(int argc, char **argv)
     // Original
     src = imread("../../../Images/anthurium_alpha.png");
     if (src.empty()) {
-        cout << "Error loading src\n";
-        return -1;
+        cout << "Error loading" << src << "\n";
+        return EXIT_FAILURE;
     }
 
     // Rect(x, y, width, height)

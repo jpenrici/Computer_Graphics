@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     // Original
     src = imread("../../../Images/anthurium_alpha.png");
     if (src.empty()) {
-        cout << "Error loading src\n";
+        cout << "Error loading " <<  src << "\n";
         return -1;
     }
 

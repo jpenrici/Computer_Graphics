@@ -1,5 +1,6 @@
 /* OpenCV 4.5.1 */
 #include <iostream>
+#include <string>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
@@ -12,16 +13,17 @@ int main(int argc, char **argv)
     string original_path = folder + "folha_doente_falsa.png";
 
     // Command line parsing
-    // CommandLineParser parser(argc, argv,"{@input | original_path | input image}");
+    CommandLineParser parser(argc, argv, "{@input || image path}");
+    if (!parser.get<String>("@input").empty()) {
+        original_path = parser.get<String>("@input");
+    }
 
-    // Load image [source, destination or mask]
-    // Mat source = imread(parser.get<string>("@input"));
-
+    // Original
     Mat source = imread(original_path);
 
     if (source.empty()) {
         cout << "could not open or find the image!\n";
-        // cout << "message: " << argv[0] << " <input image>\n";
+        cout << "message: " << argv[0] << " <input image>\n";
         return EXIT_FAILURE;
     }
 
